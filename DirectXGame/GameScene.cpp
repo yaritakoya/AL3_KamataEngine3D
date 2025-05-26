@@ -8,20 +8,21 @@ void GameScene::Initialize() {
 	camera_.Initialize();
 
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
-
-	// 自キャラの生成
-	player_ = new Player();
-	// 自キャラの初期化
-	player_->Initialize(modelPlayer_, &camera_);
-
-	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
-
+	
 	skydome_ = new Skydome();
-
-	skydome_->Initialize(modelSkydome_, &camera_);
+	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 
 	mapChipField_ = new MapChipField;
 	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
+	
+	// 自キャラの生成
+	player_ = new Player();
+	//座標をマップチップ番号で指定	
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(1,18);
+	// 自キャラの初期化
+	player_->Initialize(modelPlayer_, &camera_,playerPosition);
+
+	skydome_->Initialize(modelSkydome_, &camera_);
 
 	// ブロック
 	modelBlock_ = Model::CreateFromOBJ("block", true);

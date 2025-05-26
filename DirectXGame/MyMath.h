@@ -1,5 +1,7 @@
 #pragma once
 #include "KamataEngine.h"
+#include<cmath>
+#include<numbers>
 
 using namespace KamataEngine;
 
