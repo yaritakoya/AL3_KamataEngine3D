@@ -4,6 +4,7 @@
 #include "Skydome.h"
 #include "MapChipField.h"
 #include <vector>
+#include "CameraController.h"
 
 using namespace KamataEngine;
 
@@ -21,6 +22,8 @@ class GameScene {
 	Model* modelPlayer_ = nullptr;
 
 	Skydome* skydome_ = nullptr;
+
+	CameraController* cameraController_ = nullptr;
 
 private:
 	uint32_t textureHandle_ = 0;
