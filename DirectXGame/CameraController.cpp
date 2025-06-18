@@ -10,7 +10,7 @@ void CameraController::Initialize() {
 }
 
 void CameraController::Update() {
-	const Vector3& targetVelocity = target_->GetVelocity();
+	const Vector3& targetVelocity = target_->GetValocity();
 	// 追従対象のワールドトランスフォームを参照
 	const WorldTransform& targetWorldTransform = target_->GetWorldTransform();
 	// 追従対象とオフセットと追従対象の速度からカメラの目標座標を計算
