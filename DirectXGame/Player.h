@@ -1,8 +1,12 @@
 #include "KamataEngine.h"
 #include <vector>
+
+using namespace KamataEngine;
+
 class MapChipField;
 // 自キャラ
 class Player {
+
 	enum LRDirection {
 		kRiget,
 		kLeft,
@@ -21,25 +25,24 @@ class Player {
 private:
 	// マップとの当たり判定情報
 	struct CollisionMapInfo {
-
 		bool ceiling = false;
 		bool landing = false;
 		bool hitWall = false;
-		KamataEngine::Vector3 move;
+		Vector3 move = {};
 	};
-	KamataEngine::WorldTransform worldTransform_;
-	KamataEngine::Model* model_ = nullptr;
-	KamataEngine::Camera* camera_ = nullptr;
+	WorldTransform worldTransform_;
+	Model* model_ = nullptr;
+	Camera* camera_ = nullptr;
 	uint32_t textureHandle_ = 0u;
 
-	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformPlayer_;
+	std::vector<std::vector<WorldTransform*>> worldTransformPlayer_;
 
-	KamataEngine::Vector3 velocity_ = {};
+	Vector3 velocity_ = {};
 
 	// 移動
 	static inline const float kAcceleration = 0.2f;
 
-	static inline const float kAttenuation = 0.1f;
+	static inline const float kAttenuationLanding = 0.1f;
 	static inline const float kLimitRunSpeed = 0.1f;
 
 	// 自機の回転
@@ -65,10 +68,14 @@ private:
 	static inline const float kHeight = 0.8f;
 
 	static inline const float kBlank = 0.1f;
+	//微小な数値
+	static inline const float kGroundSearchHeight = 0.06f;
+	//着地時の速度減速率
+	static inline const float kAttenuationWall = 0.1f;
 
 public:
 	// 初期化
-	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position);
+	void Initialize(Model* model, Camera* camera, Vector3& position);
 	// 更新
 	void Update();
 	// 描画
@@ -88,10 +95,14 @@ public:
 
 	void CheckMapCollisionLeft(CollisionMapInfo& info);
 
-	KamataEngine::Vector3 CornerPosition(const KamataEngine::Vector3& center, Corner corner);
+	void CheckMapLanding(const CollisionMapInfo& info);
 
-	const KamataEngine::WorldTransform& GetWorldTransform() const { return worldTransform_; }
-	const KamataEngine::Vector3& GetValocity() const { return velocity_; }
+	void Contact(const CollisionMapInfo& info);
+
+	Vector3 CornerPosition(const Vector3& center, Corner corner);
+
+	const WorldTransform& GetWorldTransform() const { return worldTransform_; }
+	const Vector3& GetValocity() const { return velocity_; }
 	// マップチップによるフィールド
 	MapChipField* mapChipField_ = nullptr;
 
