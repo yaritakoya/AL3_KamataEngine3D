@@ -147,6 +147,23 @@ void GameScene::ChangePhase() {
 		}
 		break;
 	case Phase::kDeath:
+		// デス演出フェーズの処理
+		if (deathParticles_->IsFinished()) {
+			// デス演出終了
+			phase_ = Phase::kFadeOut;
+			fade_->Start(Fade::Status::FadeOut, 1.0f);
+		}
+		break;
+	case Phase::kFadeIn:
+		if (fade_->IsFinished()) {
+			// ゲームプレイへ切り替え
+			phase_ = Phase::kPlay;
+		}
+		break;
+	case Phase::kFadeOut:
+		if (fade_->IsFinished()) {
+			finished_ = true; // ゲームシーン終了フラグを立てる
+		}
 		break;
 	}
 }
@@ -192,10 +209,15 @@ void GameScene::Update() {
 	case Phase::kDeath:
 		// 02_12 34枚目 デス演出フェーズの処理
 		// deathParticles_->IsFinished関数をDeathParticles.hに実装
-		if (deathParticles_ && deathParticles_->IsFinished()) {
-			finished_ = true;
-		}
-
+		deathParticles_->Update();
+		break;
+	case Phase::kFadeIn:
+		// フェード
+		fade_->Update();
+		break;
+	case Phase::kFadeOut:
+		// フェードアウト中
+		fade_->Update();
 		break;
 	}
 
@@ -261,8 +283,9 @@ void GameScene::Draw() {
 	Model::PreDraw(dxCommon->GetCommandList());
 
 	// 自キャラの描画
-	if (!player_->IsDead())
+	if (phase_ == Phase::kPlay || phase_==Phase::kFadeIn) {
 		player_->Draw();
+	}
 
 	// 天球描画
 	skydome_->Draw();
