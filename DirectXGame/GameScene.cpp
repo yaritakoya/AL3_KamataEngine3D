@@ -31,6 +31,9 @@ GameScene::~GameScene() {
 	// 02_11_17枚目
 	delete deathParticles_;
 	delete deathParticle_model_;
+
+	//フェード
+	delete fade_;
 }
 
 void GameScene::Initialize() {
@@ -117,7 +120,12 @@ void GameScene::Initialize() {
 	//	    (deathParticle_model_, &camera_, playerPosition);
 
 	// 02_12_4枚目 ゲームプレイフェーズから開始
-	phase_ = Phase::kPlay;
+	phase_ = Phase::kFadeIn;
+
+	// フェード
+	fade_ = new Fade();
+	fade_->Initialize();
+	fade_->Start(Fade::Status::FadeIn, 1.0f);
 }
 
 // 02_12 10枚目 GameScene::Update関数で呼び出しておく
@@ -172,6 +180,9 @@ void GameScene::GenerateBlocks() {
 void GameScene::Update() {
 
 	ChangePhase();
+
+	// フェード
+	fade_->Update();
 
 	// 02_12 5枚目 まず追加
 	switch (phase_) {
@@ -284,6 +295,9 @@ void GameScene::Draw() {
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
+
+	// フェード
+	fade_->Draw();
 }
 
 // 02_10 16枚目
