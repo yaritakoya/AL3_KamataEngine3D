@@ -1,6 +1,8 @@
 #include "GameScene.h"
 #include "KamataEngine.h"
 #include "TitleScene.h" // 02_12 21枚目
+#include "Clear.h"
+#include "Gameover.h" 
 #include <Windows.h>
 
 using namespace KamataEngine; // これ書いておくとkamataEngine::書かなくてよい
@@ -8,12 +10,16 @@ using namespace KamataEngine; // これ書いておくとkamataEngine::書かな
 // 02_12 24枚目
 TitleScene* titleScene = nullptr;
 GameScene* gameScene = nullptr;
+Gameover* gameoverScene = nullptr;
+Clear* clearScene = nullptr;
 
 // 02_12 25枚目(Scene sceneまで)
 enum class Scene {
 	kUnknown = 0,
 	kTitle,
 	kGame,
+	kClear,
+	kDeath,
 };
 // 現在シーン（型）
 Scene scene = Scene::kUnknown;
@@ -24,7 +30,7 @@ void ChangeScene() {
 	switch (scene) {
 	case Scene::kTitle:
 		if (titleScene->IsFinished()) {
-			// シーン変更
+			// 次のシーン
 			scene = Scene::kGame;
 			delete titleScene;
 			titleScene = nullptr;
@@ -35,10 +41,30 @@ void ChangeScene() {
 	case Scene::kGame:
 		// 02_12 30枚目
 		if (gameScene->IsFinished()) {
-			// シーン変更
-			scene = Scene::kTitle;
+			// 次のシーン
+			scene = Scene::kDeath;
 			delete gameScene;
 			gameScene = nullptr;
+			gameoverScene = new Gameover;
+			gameoverScene->Initialize();
+		}
+		break;
+	case Scene::kClear:
+		if (clearScene->IsFinished()) {
+			// 次のシーン
+			scene = Scene::kTitle;
+			delete clearScene;
+			clearScene = nullptr;
+			titleScene = new TitleScene;
+			titleScene->Initialize();
+		}
+		break;
+	case Scene::kDeath:
+		if (gameoverScene->IsFinished()) {
+			// 次のシーン
+			scene = Scene::kTitle;
+			delete gameoverScene;
+			gameoverScene = nullptr;
 			titleScene = new TitleScene;
 			titleScene->Initialize();
 		}
@@ -48,13 +74,18 @@ void ChangeScene() {
 
 // 02_12 31枚目
 void UpdateScene() {
-
 	switch (scene) {
 	case Scene::kTitle:
 		titleScene->Update();
 		break;
 	case Scene::kGame:
 		gameScene->Update();
+		break;
+	case Scene::kClear:
+		clearScene->Update();
+		break;
+	case Scene::kDeath:
+		gameoverScene->Update();
 		break;
 	}
 }
@@ -67,6 +98,12 @@ void DrawScene() {
 		break;
 	case Scene::kGame:
 		gameScene->Draw();
+		break;
+	case Scene::kClear:
+		clearScene->Draw();
+		break;
+	case Scene::kDeath:
+		gameoverScene->Draw();
 		break;
 	}
 }
@@ -136,6 +173,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// 02_12 35枚目 各種解放
 	delete titleScene;
 	delete gameScene;
+	delete gameoverScene;
 
 	// エンジンの終了処理
 	KamataEngine::Finalize();

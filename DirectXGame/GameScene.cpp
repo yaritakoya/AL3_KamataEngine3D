@@ -64,7 +64,7 @@ void GameScene::Initialize() {
 
 	// 02_04マップチップ
 	mapChipField_ = new MapChipField;
-	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
+	mapChipField_->LoadMapChipCsv("Resources/blocks2.csv");
 	GenerateBlocks();
 
 	// 02_07 マップチップクラスを作ってからプレイヤークラスを作る
@@ -91,13 +91,7 @@ void GameScene::Initialize() {
 	CameraController::Rect cameraArea = {12.0f, 100 - 12.0f, 6.0f, 6.0f};
 	CController_->SetMovableArea(cameraArea);
 
-	// 02_09 10枚目 敵クラス → 02_10の5枚目で削除
-	//	enemy_ = new Enemy();
-	// 02_09 10枚目 敵モデル
 	enemy_model_ = Model::CreateFromOBJ("enemy");
-	// 02_09 10枚目 敵位置決めて敵クラス初期化 → 02_10の5枚目で削除
-	//	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(14, 18);
-	// enemy_->Initialize(enemy_model_, &camera_, enemyPosition);
 
 	// 02_10 5枚目（for文の中身全部）
 	for (int32_t i = 0; i < 2; ++i) {
@@ -112,12 +106,6 @@ void GameScene::Initialize() {
 
 	// 02_11_16枚目 モデル読み込み
 	deathParticle_model_ = Model::CreateFromOBJ("deathParticle");
-
-	// 02_11_16枚目 仮の生成処理 後で消す
-	// 02_12 13枚目で消す
-	//	deathParticles_ = new DeathParticles;
-	//	deathParticles_->Initialize
-	//	    (deathParticle_model_, &camera_, playerPosition);
 
 	// 02_12_4枚目 ゲームプレイフェーズから開始
 	phase_ = Phase::kFadeIn;

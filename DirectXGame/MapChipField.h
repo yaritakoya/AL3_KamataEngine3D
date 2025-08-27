@@ -6,6 +6,7 @@ using namespace KamataEngine;
 enum class MapChipType {
 	kBlank, // 空白
 	kBlock, // ブロック
+	kItem,  // アイテム
 };
 
 struct MapChipData {

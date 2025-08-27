@@ -38,6 +38,7 @@ private:
 		kFadeIn, // フェードイン
 		kPlay,  // ゲームプレイ
 		kDeath, // デス演出
+		kGameover, // ゲームオーバー
 		kFadeOut, // フェードアウト
 	};
 

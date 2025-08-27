@@ -1,6 +1,7 @@
 #pragma once
 #include "KamataEngine.h"
 #include "MyMath.h"
+
 using namespace KamataEngine;
 
 class MapChipField;
