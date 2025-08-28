@@ -32,6 +32,8 @@ public:
 	// 02_12 26枚目	デスフラグのgetter
 	bool IsFinished() const { return finished_; }
 
+	bool IsCleared() const { return isClear_; }
+
 private:
 	// 02_12 4枚目 ゲームのフェーズ（型）
 	enum class Phase {
@@ -103,7 +105,10 @@ private:
 
 	// 02_12 26枚目
 	bool finished_ = false;
+	bool isClear_ = false;
 
 	// フェード
 	Fade* fade_ = nullptr;
+
+	
 };

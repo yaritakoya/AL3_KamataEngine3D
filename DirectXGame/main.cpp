@@ -47,6 +47,12 @@ void ChangeScene() {
 			gameScene = nullptr;
 			gameoverScene = new Gameover;
 			gameoverScene->Initialize();
+		} else if (gameScene->IsCleared()) { // ← 追加
+			scene = Scene::kClear;
+			delete gameScene;
+			gameScene = nullptr;
+			clearScene = new Clear;
+			clearScene->Initialize();
 		}
 		break;
 	case Scene::kClear:
@@ -151,7 +157,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		dxCommon->PreDraw();
 
 		// ゲームシーンの描画
-		//		titleScene->Draw(); // 02_12 33枚目で削除
+		//titleScene->Draw(); // 02_12 33枚目で削除
 
 		// シーンの描画
 		DrawScene(); // 02_12 33枚目で追加
@@ -163,7 +169,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		PrimitiveDrawer::GetInstance()->Reset();
 
 		// ImGui描画
-		imguiManager->Draw();
 		imguiManager->Draw();
 
 		// 描画終了

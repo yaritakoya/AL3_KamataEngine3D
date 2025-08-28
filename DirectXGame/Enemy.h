@@ -34,7 +34,7 @@ private:
 	Camera* camera_ = nullptr;
 
 	// 02_09 15枚目
-	static inline const float kWalkSpeed = 0.02f;
+	static inline const float kWalkSpeed = 0.06f;
 	// 02_09 15枚目
 	Vector3 velocity_ = {};
 

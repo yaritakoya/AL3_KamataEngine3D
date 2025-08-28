@@ -444,6 +444,12 @@ void Player ::Update() {
 
 	// ワールド行列更新（アフィン変換～DirectXに転送）
 	WorldTransformUpdate(worldTransform_);
+
+	// ゴール判定（例：マップ幅 1000.0f を超えたらクリア）
+	const float kGoalX = 97.0f; // 必要に応じて調整
+	if (worldTransform_.translation_.x >= kGoalX) {
+		isClear_ = true;
+	}
 }
 
 void Player::Draw() {

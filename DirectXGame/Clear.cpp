@@ -5,22 +5,27 @@
 Clear::~Clear() {
 	delete modelPlayer_;
 	delete modelTitle_;
+	delete modelTitle1_;
 	delete fade_;
 }
 
 void Clear::Initialize() {
 
 	modelTitle_ = Model::CreateFromOBJ("ClearFont", true);
+	modelTitle1_ = Model::CreateFromOBJ("cleartitle", true);
 	modelPlayer_ = Model::CreateFromOBJ("player");
 
 	// カメラ初期化
 	camera_.Initialize();
 
 	const float kPlayerTitle = 2.0f;
+	const float kPlayerTitle1 = 2.5f;
 
 	worldTransformTitle_.Initialize();
+	worldTransformTitle1_.Initialize();
 
 	worldTransformTitle_.scale_ = {kPlayerTitle, kPlayerTitle, kPlayerTitle};
+	worldTransformTitle1_.scale_ = {kPlayerTitle1, kPlayerTitle1, kPlayerTitle1};
 
 	const float kPlayerScale = 10.0f;
 
@@ -80,6 +85,7 @@ void Clear::Update() {
 
 	// アフィン変換～DirectXに転送(タイトル座標)
 	WorldTransformUpdate(worldTransformTitle_);
+	WorldTransformUpdate(worldTransformTitle1_);
 
 	// アフィン変換～DirectXに転送（プレイヤー座標）
 	WorldTransformUpdate(worldTransformPlayer_);
@@ -94,6 +100,7 @@ void Clear::Draw() {
 	Model::PreDraw(commandList);
 
 	modelTitle_->Draw(worldTransformTitle_, camera_);
+	modelTitle1_->Draw(worldTransformTitle1_, camera_);
 	modelPlayer_->Draw(worldTransformPlayer_, camera_);
 
 	Model::PostDraw();

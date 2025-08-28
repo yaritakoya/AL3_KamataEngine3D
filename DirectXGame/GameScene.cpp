@@ -219,11 +219,21 @@ void GameScene::Update() {
 		enemy->Update();
 	}
 
-#ifdef _DEBUG
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		// フラグをトグル
-		isDebugCameraActive_ = !isDebugCameraActive_;
+	// プレイヤー死亡判定
+	if (player_->IsDead()) {
+		finished_ = true;
 	}
+
+	// プレイヤークリア判定
+	if (player_->IsClear()) {
+		isClear_ = true;
+	}
+
+#ifdef _DEBUG
+	//if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	//	// フラグをトグル
+	//	isDebugCameraActive_ = !isDebugCameraActive_;
+	//}
 #endif
 
 	// カメラの処理

@@ -50,6 +50,8 @@ public:
 	// 02_12 11枚目 デスフラグ
 	bool IsDead() const { return isDead_; }
 
+	bool IsClear() const { return isClear_; }
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -122,4 +124,6 @@ private:
 	static inline const float kAttenuationWall = 0.2f;
 	// 02_12 11枚目 デスフラグ
 	bool isDead_ = false;
+	// プレイヤーがクリアしたかどうか
+	bool isClear_ = false;
 };

@@ -31,6 +31,19 @@ void Enemy::Update() {
 	// 02_09 16枚目 移動
 	worldTransform_.translation_ += velocity_;
 
+	    // --- 左端チェック ---
+	if (worldTransform_.translation_.x < 0.0f) {
+		velocity_.x *= -1; // 進行方向を反転
+		// 向きも反転させたいなら回転も変える
+		worldTransform_.rotation_.y += std::numbers::pi_v<float>;
+	}
+
+	// 右端も設定したい場合
+	if (worldTransform_.translation_.x > 97.0f) {
+		velocity_.x *= -1;
+		worldTransform_.rotation_.y += std::numbers::pi_v<float>;
+	}
+
 	// 02_09 20枚目
 	walkTimer += 1.0f / 60.0f;
 
