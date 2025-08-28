@@ -1,5 +1,6 @@
 #include "MapChipField.h"
 #include <map>
+#include <assert.h>
 #include <fstream>
 #include <sstream>
 
