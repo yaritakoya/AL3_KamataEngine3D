@@ -37,7 +37,6 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Initialize() {
-
 	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("sample.png");
 	// スプライト生成
@@ -79,7 +78,12 @@ void GameScene::Initialize() {
 	// 02_07 スライド5枚目
 	player_->SetMapChipField(mapChipField_);
 
+	    // プレイヤー初期化
 	player_->Initialize(player_model_, &camera_, playerPosition);
+
+	// Hand の生成と初期化
+	hand_ = new Hand();
+	hand_->Initialize(player_model_, &camera_, player_);
 
 	// 02_06カメラコントローラ スライド13枚目
 	CController_ = new CameraController(); // 生成
@@ -112,12 +116,6 @@ void GameScene::Initialize() {
 
 	// 02_11_16枚目 モデル読み込み
 	deathParticle_model_ = Model::CreateFromOBJ("deathParticle");
-
-	// 02_11_16枚目 仮の生成処理 後で消す
-	// 02_12 13枚目で消す
-	//	deathParticles_ = new DeathParticles;
-	//	deathParticles_->Initialize
-	//	    (deathParticle_model_, &camera_, playerPosition);
 
 	// 02_12_4枚目 ゲームプレイフェーズから開始
 	phase_ = Phase::kFadeIn;
@@ -222,6 +220,7 @@ void GameScene::Update() {
 	}
 
 	player_->Update();
+	hand_->Update();
 	skydome_->Update();
 	CController_->Update();
 
@@ -232,10 +231,10 @@ void GameScene::Update() {
 	}
 
 #ifdef _DEBUG
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		// フラグをトグル
-		isDebugCameraActive_ = !isDebugCameraActive_;
-	}
+	//if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	//	// フラグをトグル
+	//	isDebugCameraActive_ = !isDebugCameraActive_;
+	//}
 #endif
 
 	// カメラの処理
@@ -285,6 +284,7 @@ void GameScene::Draw() {
 	// 自キャラの描画
 	if (phase_ == Phase::kPlay || phase_==Phase::kFadeIn) {
 		player_->Draw();
+		hand_->Draw();
 	}
 
 	// 天球描画

@@ -1,5 +1,6 @@
 #pragma once
 #include "Fade.h"
+#include "Hand.h"
 #include "Enemy.h"
 #include "Player.h"
 #include "skydome.h"
@@ -71,6 +72,9 @@ private:
 	// ブロックモデル
 	Model* block_model_ = nullptr;
 	std::vector<std::vector<WorldTransform*>> worldTransformBlocks_;
+
+	//Model* hand_model_ = nullptr;
+	Hand* hand_ = nullptr;
 
 	// デバッグカメラ有効
 	bool isDebugCameraActive_ = false;
