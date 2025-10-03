@@ -19,68 +19,30 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position) {
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 
 	camera_ = camera;
+
+	// 右側に初期配置（X方向に+5.0f ずらす例）
+	worldTransform_.translation_ = {5.0f, 2.0f, 0.0f};
+
+	// 行列更新
+	WorldTransformUpdate(worldTransform_);
 }
 
-// 移動入力(02_07 スライド10枚目)
+// Player.cpp — 慣性なし上下移動のみ
 void Player::InputMove() {
-
-	if (onGround_) {
-
-		// 左右移動操作
-		if (Input::GetInstance()->PushKey(DIK_RIGHT) || Input::GetInstance()->PushKey(DIK_LEFT)) {
-
-			// 左右加速
-			Vector3 acceleration = {};
-			if (Input::GetInstance()->PushKey(DIK_RIGHT)) {
-
-				if (velocity_.x < 0.0f) {
-					// 旋回の最初は移動減衰をかける
-					velocity_.x *= (1.0f - kAttenuation);
-				}
-				acceleration.x += kAcceleration / 60.0f;
-				if (lrDirection_ != LRDirection::kRight) {
-					lrDirection_ = LRDirection::kRight;
-					turnFirstRotationY_ = worldTransform_.rotation_.y;
-					turnTimer_ = kTimeTurn;
-				}
-			} else if (Input::GetInstance()->PushKey(DIK_LEFT)) {
-				if (velocity_.x > 0.0f) {
-					// 旋回の最初は移動減衰をかける
-					velocity_.x *= (1.0f - kAttenuation);
-				}
-				acceleration.x -= kAcceleration / 60.0f;
-				if (lrDirection_ != LRDirection::kLeft) {
-					lrDirection_ = LRDirection::kLeft;
-					turnFirstRotationY_ = worldTransform_.rotation_.y;
-					turnTimer_ = kTimeTurn;
-				}
-			}
-			velocity_ += acceleration;
-			velocity_.x = std::clamp(velocity_.x, -kLimitRunSpeed, kLimitRunSpeed);
-		} else {
-			// 非入力時は移動減衰をかける
-			velocity_.x *= (1.0f - kAttenuation);
-		}
-
-		// ほぼ0の場合に0にする
-		if (std::abs(velocity_.x) <= 0.0001f) {
-			velocity_.x = 0.0f;
-		}
-
-		if (Input::GetInstance()->PushKey(DIK_UP)) {
-			// ジャンプ初速
-			velocity_ += Vector3(0, kJumpAcceleration / 60.0f, 0);
-		}
+	// 左右移動は常に禁止
+	velocity_.x = 0.0f;
+	// 入力があれば一定速度で移動、離せば停止
+	if (Input::GetInstance()->PushKey(DIK_UP)) {
+		velocity_.y = kLimitRunSpeed; // 上方向に一定速度
+	} else if (Input::GetInstance()->PushKey(DIK_DOWN)) {
+		velocity_.y = -kLimitRunSpeed; // 下方向に一定速度
 	} else {
-		// 落下速度
-		velocity_ += Vector3(0, -kGravityAcceleration / 60.0f, 0);
-		velocity_.y = std::max(velocity_.y, -kLimitFallSpeed);
+		velocity_.y = 0.0f; // 停止
 	}
 }
 
 // 02_07 スライド13枚目
 void Player::CheckMapCollision(CollisionMapInfo& info) {
-
 	CheckMapCollisionUp(info);
 	CheckMapCollisionDown(info);
 	CheckMapCollisionRight(info);
@@ -368,77 +330,32 @@ Vector3 Player::CornerPosition(const Vector3& center, Corner corner) {
 	return center + offsetTable[static_cast<uint32_t>(corner)];
 }
 
-void Player ::Update() {
-
-	// 移動入力(02_07 スライド10枚目)
+void Player::Update() {
+	// 入力（上下のみ）
 	InputMove();
 
-	// 衝突情報を初期化(02_07 スライド13枚目)
+	// 衝突情報を初期化
 	CollisionMapInfo collisionMapInfo = {};
 	collisionMapInfo.move = velocity_;
 	collisionMapInfo.landing = false;
 	collisionMapInfo.hitWall = false;
 
-	// マップ衝突チェック(02_07 スライド13枚目)
+	// マップ衝突チェック
 	CheckMapCollision(collisionMapInfo);
 
-	// 移動(02_07 スライド36枚目)
+	// 移動
 	worldTransform_.translation_ += collisionMapInfo.move;
 
-	// 天井接触による落下開始(02_07 スライド38枚目)
+	// 天井に当たったら停止
 	if (collisionMapInfo.ceiling) {
 		velocity_.y = 0;
 	}
 
-	// 02_08 スライド27枚目 壁接触している場合の処理
+	// 壁・床との当たり判定
 	UpdateOnWall(collisionMapInfo);
-
-	// 接地判定
 	UpdateOnGround(collisionMapInfo);
-	/*
-	    //02_08 スライド22枚目まで実装したら
-	    //（↑でUpdateOnGround関数実装したら）コメントアウト
 
-	    //移動
-	    bool landing = false;
-
-	    // 下降あり？
-	    if (velocity_.y < 0) {
-	        // Y座標が地面以下になったら着地
-	        if (worldTransform_.translation_.y <= 1.0f) {
-	            landing = true;
-	        }
-	    }
-
-	    // 接地判定
-	    if (onGround_) {
-	        // ジャンプ開始
-	        if (velocity_.y > 0.0f) {
-	            onGround_ = false;
-	        }
-	    }else {
-	        // 着地
-	        if (landing) {
-	            worldTransform_.translation_.y = 1.0f;
-	            velocity_.x *= (1.0f - kAttenuation);
-	            velocity_.y  = 0.0f;
-	            onGround_    = true;
-	        }
-	    }
-	*/
-	// 旋回制御
-	if (turnTimer_ > 0.0f) {
-		// タイマーを進める
-		turnTimer_ = std::max(turnTimer_ - (1.0f / 60.0f), 0.0f);
-
-		float destinationRotationYTable[] = {std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float> * 3.0f / 2.0f};
-
-		float destinationRotationY = destinationRotationYTable[static_cast<uint32_t>(lrDirection_)];
-
-		worldTransform_.rotation_.y = EaseInOut(destinationRotationY, turnFirstRotationY_, turnTimer_ / kTimeTurn);
-	}
-
-	// ワールド行列更新（アフィン変換～DirectXに転送）
+	// ワールド行列更新
 	WorldTransformUpdate(worldTransform_);
 }
 
