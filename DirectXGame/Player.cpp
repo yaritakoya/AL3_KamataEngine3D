@@ -21,7 +21,8 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position) {
 	camera_ = camera;
 
 	// 右側に初期配置（X方向に+5.0f ずらす例）
-	worldTransform_.translation_ = {5.0f, 2.0f, 0.0f};
+	worldTransform_.translation_ = {4.0f, 2.0f, 0.0f};
+	worldTransform_.scale_ = {1.5f, 1.5f, 1.5f};
 
 	// 行列更新
 	WorldTransformUpdate(worldTransform_);
@@ -48,6 +49,75 @@ void Player::CheckMapCollision(CollisionMapInfo& info) {
 	CheckMapCollisionRight(info);
 	CheckMapCollisionLeft(info);
 }
+
+
+// 02_08スライド14枚目 設置状態の切り替え処理
+void Player::UpdateOnGround(const CollisionMapInfo& info) {
+
+	info;
+
+	if (onGround_) {
+		// 02_08スライド18枚目 ジャンプ開始
+		if (velocity_.y > 0.0f) {
+			onGround_ = false;
+		} else {
+			// 落下判定
+			// 落下なら空中状態に切り替え
+
+			// 02_08スライド19枚目(このelseブロック全部)
+			std::array<Vector3, kNumCorner> positionsNew;
+
+			for (uint32_t i = 0; i < positionsNew.size(); ++i) {
+				positionsNew[i] = CornerPosition(worldTransform_.translation_ + info.move, static_cast<Corner>(i));
+			}
+
+			bool hit = false;
+
+			MapChipType mapChipType;
+
+			// 左下点の判定
+			IndexSet indexSet;
+			indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kLeftBottom] + Vector3(0, -kGroundSearchHeight, 0));
+			mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
+			if (mapChipType == MapChipType::kBlock) {
+				hit = true;
+			}
+
+			// 右下点の判定
+			indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kRightBottom] + Vector3(0, -kGroundSearchHeight, 0));
+			mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
+			if (mapChipType == MapChipType::kBlock) {
+				hit = true;
+			}
+
+			// 落下開始
+			if (!hit) {
+				//				DebugText::GetInstance()->ConsolePrintf("jump");
+				onGround_ = false;
+			}
+		}
+	} else {
+		// 02_08スライド16枚目 地面に接触している場合の処理
+		if (info.landing) {
+			// 着地状態に切り替える（落下を止める）
+			onGround_ = true;
+			// 着地時にX速度を減衰
+			velocity_.x *= (1.0f - kAttenuationLanding);
+			// Y速度をゼロに
+			velocity_.y = 0.0f;
+		}
+	}
+}
+
+// 02_08スライド27枚目 壁接地中の処理
+void Player::UpdateOnWall(const CollisionMapInfo& info) {
+
+	if (info.hitWall) {
+		velocity_.x *= (1.0f - kAttenuationWall);
+	}
+}
+
+#pragma region CheckMapCollision
 
 // 02_07 スライド14枚目(上下左右全て)
 void Player::CheckMapCollisionUp(CollisionMapInfo& info) {
@@ -152,72 +222,6 @@ void Player::CheckMapCollisionDown(CollisionMapInfo& info) {
 	}
 }
 
-// 02_08スライド14枚目 設置状態の切り替え処理
-void Player::UpdateOnGround(const CollisionMapInfo& info) {
-
-	info;
-
-	if (onGround_) {
-		// 02_08スライド18枚目 ジャンプ開始
-		if (velocity_.y > 0.0f) {
-			onGround_ = false;
-		} else {
-			// 落下判定
-			// 落下なら空中状態に切り替え
-
-			// 02_08スライド19枚目(このelseブロック全部)
-			std::array<Vector3, kNumCorner> positionsNew;
-
-			for (uint32_t i = 0; i < positionsNew.size(); ++i) {
-				positionsNew[i] = CornerPosition(worldTransform_.translation_ + info.move, static_cast<Corner>(i));
-			}
-
-			bool hit = false;
-
-			MapChipType mapChipType;
-
-			// 左下点の判定
-			IndexSet indexSet;
-			indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kLeftBottom] + Vector3(0, -kGroundSearchHeight, 0));
-			mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
-			if (mapChipType == MapChipType::kBlock) {
-				hit = true;
-			}
-
-			// 右下点の判定
-			indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kRightBottom] + Vector3(0, -kGroundSearchHeight, 0));
-			mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
-			if (mapChipType == MapChipType::kBlock) {
-				hit = true;
-			}
-
-			// 落下開始
-			if (!hit) {
-				//				DebugText::GetInstance()->ConsolePrintf("jump");
-				onGround_ = false;
-			}
-		}
-	} else {
-		// 02_08スライド16枚目 地面に接触している場合の処理
-		if (info.landing) {
-			// 着地状態に切り替える（落下を止める）
-			onGround_ = true;
-			// 着地時にX速度を減衰
-			velocity_.x *= (1.0f - kAttenuationLanding);
-			// Y速度をゼロに
-			velocity_.y = 0.0f;
-		}
-	}
-}
-
-// 02_08スライド27枚目 壁接地中の処理
-void Player::UpdateOnWall(const CollisionMapInfo& info) {
-
-	if (info.hitWall) {
-		velocity_.x *= (1.0f - kAttenuationWall);
-	}
-}
-
 // 中身入れるのは02_08スライド25枚目
 void Player::CheckMapCollisionRight(CollisionMapInfo& info) {
 
@@ -316,6 +320,8 @@ void Player::CheckMapCollisionLeft(CollisionMapInfo& info) {
 		}
 	}
 }
+
+#pragma endregion
 
 // 02_07 スライド17枚目
 Vector3 Player::CornerPosition(const Vector3& center, Corner corner) {

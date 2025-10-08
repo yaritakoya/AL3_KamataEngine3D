@@ -49,6 +49,10 @@ public:
 	// 02_12 11枚目 デスフラグ
 	bool IsDead() const { return isDead_; }
 
+	Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
+	Vector3 GetWorldRotation() const { return worldTransform_.rotation_; }
+
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;

@@ -1,6 +1,7 @@
 #pragma once
 #include "Fade.h"
 #include "Hand.h"
+#include "lane.h"
 #include "Enemy.h"
 #include "Player.h"
 #include "skydome.h"
@@ -75,6 +76,10 @@ private:
 
 	//Model* hand_model_ = nullptr;
 	Hand* hand_ = nullptr;
+
+	//レーン
+	Lane* lane_ = nullptr;       // ← Laneクラスのポインタを追加
+	Model* laneModel_ = nullptr; // ← Laneの3Dモデル用
 
 	// デバッグカメラ有効
 	bool isDebugCameraActive_ = false;

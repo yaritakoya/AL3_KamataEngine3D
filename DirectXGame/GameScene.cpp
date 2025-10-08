@@ -37,6 +37,7 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Initialize() {
+
 	// ファイル名を指定してテクスチャを読み込む
 	textureHandle_ = TextureManager::Load("sample.png");
 	// スプライト生成
@@ -75,6 +76,9 @@ void GameScene::Initialize() {
 	player_model_ = Model::CreateFromOBJ("player");
 	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
 
+	// laneモデル
+	laneModel_ = Model::CreateFromOBJ("lane");
+
 	// 02_07 スライド5枚目
 	player_->SetMapChipField(mapChipField_);
 
@@ -84,6 +88,10 @@ void GameScene::Initialize() {
 	// Hand の生成と初期化
 	hand_ = new Hand();
 	hand_->Initialize(player_model_, &camera_, player_);
+
+	// 初期化
+	lane_ = new Lane();
+	lane_->Initialize(laneModel_,{0.0f, 0.0f, 0.0f});
 
 	// 02_06カメラコントローラ スライド13枚目
 	CController_ = new CameraController(); // 生成
