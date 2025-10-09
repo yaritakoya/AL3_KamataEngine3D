@@ -23,6 +23,8 @@ void Enemy::Initialize(Model* model, Camera* camera, const Vector3& position) {
 	velocity_ = {-kWalkSpeed, 0, 0};
 	// 02_09 20枚目
 	walkTimer = 0.0f;
+
+	  basePosition_ = position; // ← ここで初期位置を保存
 }
 
 // 02_09 スライド5枚目
@@ -78,4 +80,8 @@ Vector3 Enemy::GetWorldPosition() {
 void Enemy::OnCollision(const Player* player) {
 	(void)player;
 	//
+}
+
+void Enemy::ResetPosition() {
+	worldTransform_.translation_ = basePosition_; // 初期位置に戻す
 }

@@ -8,6 +8,12 @@
 #include <cassert>
 #include <numbers>
 
+// EaseOutQuart関数（0〜1 のtを渡す）
+float EaseOutQuart(float t) { 
+	return 1 - powf(1 - t, 4); 
+}
+
+
 void Player::Initialize(Model* model, Camera* camera, const Vector3& position) {
 
 	assert(model);
@@ -29,19 +35,36 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position) {
 }
 
 
-// Player.cpp — 慣性なし上下移動のみ
 void Player::InputMove() {
-	// 左右移動は常に禁止
-	velocity_.x = 0.0f;
-	// 入力があれば一定速度で移動、離せば停止
-	if (Input::GetInstance()->PushKey(DIK_UP)) {
-		velocity_.y = kLimitRunSpeed; // 上方向に一定速度
-	} else if (Input::GetInstance()->PushKey(DIK_DOWN)) {
-		velocity_.y = -kLimitRunSpeed; // 下方向に一定速度
-	} else {
-		velocity_.y = 0.0f; // 停止
+	Input* input = Input::GetInstance();
+
+	const float kLowY = 3.0f;
+	const float kHighY = 9.0f;
+
+	// 上下入力：押された瞬間に移動開始
+	if (!isMoving_) {
+		if (input->TriggerKey(DIK_UP)) {
+			startY_ = worldTransform_.translation_.y;
+			targetY_ = kHighY;
+			moveTimer_ = 0.0f;
+			isMoving_ = true;
+		} else if (input->TriggerKey(DIK_DOWN)) {
+			startY_ = worldTransform_.translation_.y;
+			targetY_ = kLowY;
+			moveTimer_ = 0.0f;
+			isMoving_ = true;
+		}
 	}
 
+	// 左右移動は従来通り
+	const float moveSpeed = 0.1f;
+	if (input->PushKey(DIK_RIGHT)) {
+		worldTransform_.translation_.x += moveSpeed;
+		lrDirection_ = LRDirection::kRight;
+	} else if (input->PushKey(DIK_LEFT)) {
+		worldTransform_.translation_.x -= moveSpeed;
+		lrDirection_ = LRDirection::kLeft;
+	}
 }
 
 // --- 攻撃関連実装 ---
@@ -370,6 +393,20 @@ Vector3 Player::CornerPosition(const Vector3& center, Corner corner) {
 void Player::Update() {
 	// 入力（上下のみ）
 	InputMove();
+
+	    // イージング移動中の処理
+	if (isMoving_) {
+		const float duration = 0.2f;           // 0.2秒で完了（調整可）
+		moveTimer_ += 1.0f / 60.0f / duration; // 60fps基準
+		float t = std::clamp(moveTimer_, 0.0f, 1.0f);
+		float eased = EaseOutQuart(t);
+		worldTransform_.translation_.y = startY_ + (targetY_ - startY_) * eased;
+
+		if (t >= 1.0f) {
+			isMoving_ = false;
+			worldTransform_.translation_.y = targetY_; // 最終位置にスナップ
+		}
+	}
 
 	// 衝突情報を初期化
 	CollisionMapInfo collisionMapInfo = {};

@@ -91,7 +91,6 @@ void GameScene::Initialize() {
 	// Player のカメラを共有
 	lane_->SetCamera(&camera_);
 
-
 	// 02_07 スライド5枚目
 	player_->SetMapChipField(mapChipField_);
 
@@ -131,7 +130,6 @@ void GameScene::Initialize() {
 
 		enemies_.push_back(newEnemy);
 	}
-
 
 	// 02_11_16枚目 モデル読み込み
 	deathParticle_model_ = Model::CreateFromOBJ("deathParticle");
@@ -333,7 +331,12 @@ void GameScene::Draw() {
 		enemy->Draw();
 	}
 
-// 既にあるプレイヤー用デスパーティクル描画の直後に追加
+	// 既にあるプレイヤー用デスパーティクル描画の直後に追加
+	if (deathParticles_) {
+		deathParticles_->Draw();
+	}
+
+	// 既にあるプレイヤー用デスパーティクル描画の直後に追加
 	if (deathParticles_) {
 		deathParticles_->Draw();
 	}
@@ -342,7 +345,6 @@ void GameScene::Draw() {
 	for (DeathParticles* effect : enemyDeathParticles_) {
 		effect->Draw();
 	}
-
 
 	Model::PostDraw();
 
@@ -361,19 +363,19 @@ void GameScene::CheckAllCollisions() {
 	AABB aabb1, aabb2;
 
 #pragma region 自キャラと敵キャラの当たり判定
-
 	{
+		// 自キャラのAABBを取得
 		aabb1 = player_->GetAABB();
 
 		for (Enemy* enemy : enemies_) {
 			aabb2 = enemy->GetAABB();
+
 			if (IsCollision(aabb1, aabb2)) {
-				player_->OnCollision(enemy);
-				enemy->OnCollision(player_);
+				// Playerは死なない → Enemyを初期位置に戻す
+				enemy->ResetPosition();
 			}
 		}
 	}
-
 #pragma endregion
 
 #pragma region プレイヤー攻撃と敵キャラの当たり判定
@@ -413,7 +415,4 @@ void GameScene::CheckAllCollisions() {
 		}
 	}
 #pragma endregion
-
-
-
 }

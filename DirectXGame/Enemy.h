@@ -27,6 +27,9 @@ public:
 
 	void SetMoveSpeed(float speed) { moveSpeed_ = speed; }
 	float GetMoveSpeed() const { return moveSpeed_; }
+	void ResetPosition(); // 既存
+	void SetActive(bool active) { isActive_ = active; }
+	bool IsActive() const { return isActive_; }
 
 private:
 	// 02_09 6枚目 ザ・ワールド
@@ -37,7 +40,7 @@ private:
 	Camera* camera_ = nullptr;
 
 	// 02_09 15枚目
-	static inline const float kWalkSpeed = 0.02f;
+	static inline const float kWalkSpeed = 0.1f;
 	// 02_09 15枚目
 	Vector3 velocity_ = {};
 
@@ -56,5 +59,6 @@ private:
 
 	// 敵の移動速度（フレーム単位の移動量など）
 	float moveSpeed_ = 2.0f; // 初期値はお好みで（例: 0.1f）
-
+	bool isActive_ = true; // 表示・当たり判定ON
+	Vector3 basePosition_;
 };

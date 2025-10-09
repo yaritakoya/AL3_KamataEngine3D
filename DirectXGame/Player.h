@@ -137,4 +137,10 @@ private:
 	static inline const float kAttackDepth = 0.8f;     // 奥行き
 	static inline const float kAttackDuration = 0.12f; // 攻撃時間（秒）
 	float attackTimer_ = 0.0f;
+
+	// イージング制御用変数
+	float startY_ = 3.0f;
+	float targetY_ = 3.0f;
+	float moveTimer_ = 0.0f;
+	bool isMoving_ = false;
 };
