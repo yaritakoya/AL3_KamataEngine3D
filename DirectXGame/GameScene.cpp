@@ -32,7 +32,7 @@ GameScene::~GameScene() {
 	delete deathParticles_;
 	delete deathParticle_model_;
 
-	//フェード
+	// フェード
 	delete fade_;
 }
 
@@ -76,22 +76,24 @@ void GameScene::Initialize() {
 	player_model_ = Model::CreateFromOBJ("player");
 	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
 
-	// laneモデル
+	// Player 初期化
+	player_ = new Player();
+	player_->Initialize(player_model_, &camera_, {4.0f, 2.0f, 0.0f});
+
+	// Player の位置を取得
+	Vector3 playerPos = player_->GetWorldPosition();
+
+	// Lane 初期化（Player の位置を渡す）
 	laneModel_ = Model::CreateFromOBJ("lane");
+	lane_ = new Lane();
+	lane_->Initialize(laneModel_, playerPos);
+
+	// Player のカメラを共有
+	lane_->SetCamera(&camera_);
+
 
 	// 02_07 スライド5枚目
 	player_->SetMapChipField(mapChipField_);
-
-	    // プレイヤー初期化
-	player_->Initialize(player_model_, &camera_, playerPosition);
-
-	// Hand の生成と初期化
-	hand_ = new Hand();
-	hand_->Initialize(player_model_, &camera_, player_);
-
-	// 初期化
-	lane_ = new Lane();
-	lane_->Initialize(laneModel_,{0.0f, 0.0f, 0.0f});
 
 	// 02_06カメラコントローラ スライド13枚目
 	CController_ = new CameraController(); // 生成
@@ -110,17 +112,26 @@ void GameScene::Initialize() {
 	// 02_09 10枚目 敵位置決めて敵クラス初期化 → 02_10の5枚目で削除
 	//	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(14, 18);
 	// enemy_->Initialize(enemy_model_, &camera_, enemyPosition);
+	float playerY = player_->GetWorldPosition().y; // プレイヤーの高さに合わせる
 
-	// 02_10 5枚目（for文の中身全部）
-	for (int32_t i = 0; i < 2; ++i) {
+	// 画面右端から出現（例: x = 50.0f）
+	float startX = 30.0f;
+	float startZ = 0.0f;
+
+	// 3体並べる（間隔2.0f）
+	for (int32_t i = 0; i < 3; ++i) {
 		Enemy* newEnemy = new Enemy();
 
-		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(14 + i * 2, 18);
+		Vector3 enemyPosition = {startX + i * 4.0f, playerY, startZ};
 
 		newEnemy->Initialize(enemy_model_, &camera_, enemyPosition);
 
+		// 移動速度を調整するための関数がある場合
+		newEnemy->SetMoveSpeed(0.2f); // ← 速度アップ（デフォルト0.05〜0.1程度なら倍速）
+
 		enemies_.push_back(newEnemy);
 	}
+
 
 	// 02_11_16枚目 モデル読み込み
 	deathParticle_model_ = Model::CreateFromOBJ("deathParticle");
@@ -228,7 +239,6 @@ void GameScene::Update() {
 	}
 
 	player_->Update();
-	hand_->Update();
 	skydome_->Update();
 	CController_->Update();
 
@@ -239,10 +249,10 @@ void GameScene::Update() {
 	}
 
 #ifdef _DEBUG
-	//if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	// if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 	//	// フラグをトグル
 	//	isDebugCameraActive_ = !isDebugCameraActive_;
-	//}
+	// }
 #endif
 
 	// カメラの処理
@@ -279,6 +289,16 @@ void GameScene::Update() {
 	if (deathParticles_) {
 		deathParticles_->Update();
 	}
+	// 敵の死エフェクトを更新（Player の deathParticles_ と同じように扱う）
+	for (auto it = enemyDeathParticles_.begin(); it != enemyDeathParticles_.end();) {
+		(*it)->Update();
+		if ((*it)->IsFinished()) {
+			delete *it;
+			it = enemyDeathParticles_.erase(it);
+		} else {
+			++it;
+		}
+	}
 }
 
 void GameScene::Draw() {
@@ -290,9 +310,8 @@ void GameScene::Draw() {
 	Model::PreDraw(dxCommon->GetCommandList());
 
 	// 自キャラの描画
-	if (phase_ == Phase::kPlay || phase_==Phase::kFadeIn) {
+	if (phase_ == Phase::kPlay || phase_ == Phase::kFadeIn) {
 		player_->Draw();
-		hand_->Draw();
 	}
 
 	// 天球描画
@@ -314,10 +333,16 @@ void GameScene::Draw() {
 		enemy->Draw();
 	}
 
-	// 02_11 18枚目 デスパーティクルあれば描画
+// 既にあるプレイヤー用デスパーティクル描画の直後に追加
 	if (deathParticles_) {
 		deathParticles_->Draw();
 	}
+
+	// --- ここに敵用デスパーティクルを描画（Player と同じやり方） ---
+	for (DeathParticles* effect : enemyDeathParticles_) {
+		effect->Draw();
+	}
+
 
 	Model::PostDraw();
 
@@ -331,30 +356,64 @@ void GameScene::Draw() {
 	fade_->Draw();
 }
 
-// 02_10 16枚目
 void GameScene::CheckAllCollisions() {
 
-	// 判定対象1と2の座標
 	AABB aabb1, aabb2;
 
 #pragma region 自キャラと敵キャラの当たり判定
+
 	{
-		// 自キャラの座標
 		aabb1 = player_->GetAABB();
 
-		// 自キャラと敵弾全ての当たり判定
 		for (Enemy* enemy : enemies_) {
-			// 敵弾の座標
 			aabb2 = enemy->GetAABB();
-
-			// AABB同士の交差判定
 			if (IsCollision(aabb1, aabb2)) {
-				// 自キャラの衝突時コールバックを呼び出す
 				player_->OnCollision(enemy);
-				// 敵弾の衝突時コールバックを呼び出す
 				enemy->OnCollision(player_);
 			}
 		}
 	}
+
 #pragma endregion
+
+#pragma region プレイヤー攻撃と敵キャラの当たり判定
+	{
+		if (player_->IsAttacking()) {
+			AABB attackAABB = player_->GetAttackAABB();
+
+			// 当たった敵を一時的に集めるリスト
+			std::vector<Enemy*> toRemove;
+
+			for (Enemy* enemy : enemies_) {
+				AABB enemyAABB = enemy->GetAABB();
+				if (IsCollision(attackAABB, enemyAABB)) {
+					// --- ここで Player と同じやり方でエフェクトを作る ---
+					// 敵の位置を取得（削除する前に位置を取ることが重要）
+					const Vector3 enemyPos = enemy->GetWorldPosition();
+
+					DeathParticles* enemyEffect = new DeathParticles;
+					enemyEffect->Initialize(deathParticle_model_, &camera_, enemyPos);
+
+					// Player と同じ扱いで管理リストに追加
+					enemyDeathParticles_.push_back(enemyEffect);
+
+					// 削除候補にマーク（実際の delete と vector からの erase は後で）
+					toRemove.push_back(enemy);
+				}
+			}
+
+			// 実際に敵を削除（vector を破壊しながら操作しない安全なやり方）
+			for (Enemy* e : toRemove) {
+				auto it = std::find(enemies_.begin(), enemies_.end(), e);
+				if (it != enemies_.end()) {
+					delete *it;
+					enemies_.erase(it);
+				}
+			}
+		}
+	}
+#pragma endregion
+
+
+
 }

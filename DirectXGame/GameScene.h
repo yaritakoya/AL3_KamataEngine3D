@@ -1,6 +1,5 @@
 #pragma once
 #include "Fade.h"
-#include "Hand.h"
 #include "lane.h"
 #include "Enemy.h"
 #include "Player.h"
@@ -74,9 +73,6 @@ private:
 	Model* block_model_ = nullptr;
 	std::vector<std::vector<WorldTransform*>> worldTransformBlocks_;
 
-	//Model* hand_model_ = nullptr;
-	Hand* hand_ = nullptr;
-
 	//レーン
 	Lane* lane_ = nullptr;       // ← Laneクラスのポインタを追加
 	Model* laneModel_ = nullptr; // ← Laneの3Dモデル用
@@ -105,6 +101,7 @@ private:
 
 	// 02_11 15枚目
 	DeathParticles* deathParticles_ = nullptr;
+	std::vector<DeathParticles*> enemyDeathParticles_;
 
 	// 02_11 16枚目
 	Model* deathParticle_model_ = nullptr;

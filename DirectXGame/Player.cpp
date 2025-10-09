@@ -21,12 +21,13 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position) {
 	camera_ = camera;
 
 	// 右側に初期配置（X方向に+5.0f ずらす例）
-	worldTransform_.translation_ = {4.0f, 2.0f, 0.0f};
+	worldTransform_.translation_ = {4.0f, 3.0f, 0.0f};
 	worldTransform_.scale_ = {1.5f, 1.5f, 1.5f};
 
 	// 行列更新
 	WorldTransformUpdate(worldTransform_);
 }
+
 
 // Player.cpp — 慣性なし上下移動のみ
 void Player::InputMove() {
@@ -40,6 +41,36 @@ void Player::InputMove() {
 	} else {
 		velocity_.y = 0.0f; // 停止
 	}
+
+}
+
+// --- 攻撃関連実装 ---
+
+void Player::TryStartAttack() {
+	Input* input = Input::GetInstance();
+
+	// Space押下時に攻撃開始（押しっぱなし防止）
+	if (attackTimer_ <= 0.0f && input->TriggerKey(DIK_SPACE)) {
+		attackTimer_ = kAttackDuration;
+		// 攻撃開始時のSEやエフェクトをここで鳴らせます
+	}
+}
+
+AABB Player::GetAttackAABB() const {
+	AABB aabb;
+	Vector3 p = worldTransform_.translation_;
+
+	float dir = (lrDirection_ == LRDirection::kRight) ? +1.0f : -1.0f;
+	float halfRange = kAttackRange * 0.5f;
+	float halfHeight = kAttackHeight * 0.5f;
+	float halfDepth = kAttackDepth * 0.5f;
+
+	Vector3 center = {p.x + dir * (0.5f + halfRange), p.y, p.z};
+
+	aabb.min = {center.x - halfRange, center.y - halfHeight, center.z - halfDepth};
+	aabb.max = {center.x + halfRange, center.y + halfHeight, center.z + halfDepth};
+	return aabb;
+
 }
 
 // 02_07 スライド13枚目
@@ -363,13 +394,39 @@ void Player::Update() {
 
 	// ワールド行列更新
 	WorldTransformUpdate(worldTransform_);
+
+    // 攻撃開始トライ（Space押下）
+	TryStartAttack();
+
+	// 攻撃タイマー更新
+	if (attackTimer_ > 0.0f) {
+		attackTimer_ -= 1.0f / 60.0f; // 60fps前提
+		if (attackTimer_ < 0.0f)
+			attackTimer_ = 0.0f;
+	}
+
 }
 
 void Player::Draw() {
 
 	// モデル描画
 	model_->Draw(worldTransform_, *camera_);
+	// 攻撃判定を可視化（デバッグ表示）
+	DrawAttackAABB();
 }
+
+// --- 攻撃範囲をデバッグ描画する関数 ---
+void Player::DrawAttackAABB() {
+	if (!IsAttacking())
+		return;
+
+	AABB atk = GetAttackAABB();
+
+	ImGui::Begin("Debug"); // ← これがないと CurrentWindow が null
+	ImGui::GetWindowDrawList()->AddRect(ImVec2(atk.min.x * 50 + 640, -atk.min.y * 50 + 360), ImVec2(atk.max.x * 50 + 640, -atk.max.y * 50 + 360), IM_COL32(255, 0, 0, 255), 0.0f, 0, 2.0f);
+	ImGui::End();
+}
+
 
 // 02_10 10枚目
 Vector3 Player::GetWorldPosition() {

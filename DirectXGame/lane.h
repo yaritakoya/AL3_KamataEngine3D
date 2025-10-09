@@ -1,3 +1,4 @@
+#pragma once
 #include "KamataEngine.h"
 #include "MyMath.h"
 
@@ -11,8 +12,11 @@ public:
 	// 更新
 	void Update();
 
-	// 描画（Playerと同じ形式）
+	// 描画
 	void Draw();
+
+	// カメラをセット
+	void SetCamera(Camera* camera) { camera_ = camera; }
 
 private:
 	WorldTransform worldTransform_;

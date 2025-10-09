@@ -1,6 +1,7 @@
 #pragma once
 #include "KamataEngine.h"
 #include "MyMath.h"
+
 using namespace KamataEngine;
 
 class MapChipField;
@@ -52,6 +53,10 @@ public:
 	Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
 	Vector3 GetWorldRotation() const { return worldTransform_.rotation_; }
 
+    void TryStartAttack();                                   // Spaceキーで攻撃開始
+	bool IsAttacking() const { return attackTimer_ > 0.0f; } // 攻撃中判定
+	AABB GetAttackAABB() const;                              // 攻撃当たり判定取得
+	void DrawAttackAABB();                                   // ← 攻撃範囲をデバッグ描画する関数を追加！
 
 private:
 	// ワールド変換データ
@@ -125,4 +130,11 @@ private:
 	static inline const float kAttenuationWall = 0.2f;
 	// 02_12 11枚目 デスフラグ
 	bool isDead_ = false;
+
+    // 攻撃関連（追加）
+	static inline const float kAttackRange = 0.8f;     // 前方距離
+	static inline const float kAttackHeight = 0.8f;    // 高さ
+	static inline const float kAttackDepth = 0.8f;     // 奥行き
+	static inline const float kAttackDuration = 0.12f; // 攻撃時間（秒）
+	float attackTimer_ = 0.0f;
 };

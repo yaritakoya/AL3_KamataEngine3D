@@ -25,6 +25,9 @@ public:
 	// 02_10 スライド20枚目 衝突応答
 	void OnCollision(const Player* player);
 
+	void SetMoveSpeed(float speed) { moveSpeed_ = speed; }
+	float GetMoveSpeed() const { return moveSpeed_; }
+
 private:
 	// 02_09 6枚目 ザ・ワールド
 	WorldTransform worldTransform_;
@@ -50,4 +53,8 @@ private:
 	// 02_10 14枚目 当たり判定サイズ
 	static inline const float kWidth = 0.8f;
 	static inline const float kHeight = 0.8f;
+
+	// 敵の移動速度（フレーム単位の移動量など）
+	float moveSpeed_ = 2.0f; // 初期値はお好みで（例: 0.1f）
+
 };

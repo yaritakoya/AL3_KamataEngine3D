@@ -111,7 +111,6 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Fade.cpp" />
     <ClCompile Include="GameScene.cpp" />
-    <ClCompile Include="Hand.cpp" />
     <ClCompile Include="lane.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapChipField.cpp" />
@@ -201,7 +200,6 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Fade.h" />
     <ClInclude Include="GameScene.h" />
-    <ClInclude Include="Hand.h" />
     <ClInclude Include="lane.h" />
     <ClInclude Include="MapChipField.h" />
     <ClInclude Include="MyMath.h" />
