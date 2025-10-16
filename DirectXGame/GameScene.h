@@ -111,4 +111,6 @@ private:
 
 	// フェード
 	Fade* fade_ = nullptr;
+
+	 int score_ = 0;
 };

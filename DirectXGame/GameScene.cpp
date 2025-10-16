@@ -246,6 +246,14 @@ void GameScene::Update() {
 		enemy->Update();
 	}
 
+	for (Enemy* enemy : enemies_) {
+		Vector3 pos = enemy->GetWorldPosition();
+		if (pos.x <= 0.0f) {
+			pos.x = 30.0f; // 右端リスポーン
+			enemy->SetWorldPosition(pos);
+		}
+	}
+
 #ifdef _DEBUG
 	// if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 	//	// フラグをトグル
@@ -383,35 +391,61 @@ void GameScene::CheckAllCollisions() {
 		if (player_->IsAttacking()) {
 			AABB attackAABB = player_->GetAttackAABB();
 
-			// 当たった敵を一時的に集めるリスト
+			// 攻撃AABBの中心X
+			float attackCenterX = (attackAABB.min.x + attackAABB.max.x) * 0.5f;
+
+			// AABBの横幅
+			float attackWidth = attackAABB.max.x - attackAABB.min.x;
+			float halfWidth = attackWidth * 0.5f;
+			float quarterWidth = halfWidth * 0.5f;
+
+			// ※本来削除対象を集めていたリストは残すが使わない
 			std::vector<Enemy*> toRemove;
 
 			for (Enemy* enemy : enemies_) {
 				AABB enemyAABB = enemy->GetAABB();
 				if (IsCollision(attackAABB, enemyAABB)) {
-					// --- ここで Player と同じやり方でエフェクトを作る ---
-					// 敵の位置を取得（削除する前に位置を取ることが重要）
-					const Vector3 enemyPos = enemy->GetWorldPosition();
 
+					// ---------- ★スコア判定 ----------
+					Vector3 enemyPos = enemy->GetWorldPosition();
+					float distX = enemyPos.x - attackCenterX;
+					float absDist = fabsf(distX);
+
+					if (absDist < quarterWidth * 0.5f) {
+						score_ += 2;
+						// OutputDebugStringA("PERFECT\n");
+					} else if (absDist < halfWidth) {
+						score_ += 1;
+						// OutputDebugStringA("GREAT\n");
+					} else {
+						// OutputDebugStringA("BAD\n");
+					}
+
+					// ---------- ★エフェクト（従来通り） ----------
 					DeathParticles* enemyEffect = new DeathParticles;
 					enemyEffect->Initialize(deathParticle_model_, &camera_, enemyPos);
-
-					// Player と同じ扱いで管理リストに追加
 					enemyDeathParticles_.push_back(enemyEffect);
 
-					// 削除候補にマーク（実際の delete と vector からの erase は後で）
-					toRemove.push_back(enemy);
+					// ---------- ★削除の代わりに右端へワープ ----------
+					float respawnX = 30.0f;
+					enemyPos.x = respawnX;
+					enemy->SetWorldPosition(enemyPos);
+
+					// ---------- ★元の削除処理はコメントアウトで残す ----------
+					// toRemove.push_back(enemy);
 				}
 			}
 
-			// 実際に敵を削除（vector を破壊しながら操作しない安全なやり方）
+			// ▼▼▼ 元の削除処理はコメントアウトして保持 ▼▼▼
+			/*
 			for (Enemy* e : toRemove) {
-				auto it = std::find(enemies_.begin(), enemies_.end(), e);
-				if (it != enemies_.end()) {
-					delete *it;
-					enemies_.erase(it);
-				}
+			    auto it = std::find(enemies_.begin(), enemies_.end(), e);
+			    if (it != enemies_.end()) {
+			        delete *it;
+			        enemies_.erase(it);
+			    }
 			}
+			*/
 		}
 	}
 #pragma endregion

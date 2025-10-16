@@ -85,3 +85,8 @@ void Enemy::OnCollision(const Player* player) {
 void Enemy::ResetPosition() {
 	worldTransform_.translation_ = basePosition_; // 初期位置に戻す
 }
+
+void Enemy::SetWorldPosition(const Vector3& pos) {
+	worldTransform_.translation_ = pos;
+	WorldTransformUpdate(worldTransform_);
+}

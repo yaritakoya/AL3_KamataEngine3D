@@ -88,13 +88,20 @@ AABB Player::GetAttackAABB() const {
 	float halfHeight = kAttackHeight * 0.5f;
 	float halfDepth = kAttackDepth * 0.5f;
 
-	Vector3 center = {p.x + dir * (0.5f + halfRange), p.y, p.z};
+	// ★ 追加：マップチップ1.5マス右にずらす
+	float offsetX = 1.5f;
+
+	// 中心を前方方向＋1.5マス分ずらす
+	Vector3 center = {
+	    p.x + dir * (0.5f + halfRange) + offsetX, // ← ここで右に1.5マス分加算
+	    p.y, p.z};
 
 	aabb.min = {center.x - halfRange, center.y - halfHeight, center.z - halfDepth};
 	aabb.max = {center.x + halfRange, center.y + halfHeight, center.z + halfDepth};
-	return aabb;
 
+	return aabb;
 }
+
 
 // 02_07 スライド13枚目
 void Player::CheckMapCollision(CollisionMapInfo& info) {
@@ -445,12 +452,16 @@ void Player::Update() {
 }
 
 void Player::Draw() {
-
-	// モデル描画
+	// Player 本体
 	model_->Draw(worldTransform_, *camera_);
-	// 攻撃判定を可視化（デバッグ表示）
+
+	// 攻撃範囲（OBJで可視化）
+	DrawAttackHitboxObj();
+
+	// 既存のAABB描画（デバッグライン用）
 	DrawAttackAABB();
 }
+
 
 // --- 攻撃範囲をデバッグ描画する関数 ---
 void Player::DrawAttackAABB() {
@@ -497,4 +508,33 @@ void Player::OnCollision(const Enemy* enemy) {
 
 	// 02_12 12枚目 書き換え
 	isDead_ = true;
+}
+
+void Player::DrawAttackHitboxObj() {
+	if (!IsAttacking())
+		return; // 攻撃中のみ
+
+	// 攻撃範囲のAABBを取得
+	AABB attackAABB = GetAttackAABB();
+
+	// 中心座標を計算
+	Vector3 center = {
+	    (attackAABB.min.x + attackAABB.max.x) * 0.5f,
+	    (attackAABB.min.y + attackAABB.max.y) * 0.5f,
+	    (attackAABB.min.z + attackAABB.max.z) * 0.5f,
+	};
+
+	// ワールド変換を初期化
+	attackWorldTransform_.Initialize();
+	attackWorldTransform_.scale_ = worldTransform_.scale_;
+	attackWorldTransform_.rotation_ = worldTransform_.rotation_;
+	attackWorldTransform_.translation_ = center;
+
+	// 行列を手動で作成してGPUへ転送
+	attackWorldTransform_.matWorld_ = MakeAffineMatrix(attackWorldTransform_.scale_, attackWorldTransform_.rotation_, attackWorldTransform_.translation_);
+
+	attackWorldTransform_.TransferMatrix(); // なければこの行は削除
+
+	// モデルを描画（Playerと同じ描画方法）
+	model_->Draw(attackWorldTransform_, *camera_);
 }

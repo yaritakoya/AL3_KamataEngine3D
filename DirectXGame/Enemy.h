@@ -30,6 +30,8 @@ public:
 	void ResetPosition(); // 既存
 	void SetActive(bool active) { isActive_ = active; }
 	bool IsActive() const { return isActive_; }
+	void SetWorldPosition(const Vector3& pos);
+
 
 private:
 	// 02_09 6枚目 ザ・ワールド

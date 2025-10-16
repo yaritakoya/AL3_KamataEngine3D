@@ -58,6 +58,10 @@ public:
 	AABB GetAttackAABB() const;                              // 攻撃当たり判定取得
 	void DrawAttackAABB();                                   // ← 攻撃範囲をデバッグ描画する関数を追加！
 
+	WorldTransform attackWorldTransform_;
+	void DrawAttackHitboxObj();
+
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
