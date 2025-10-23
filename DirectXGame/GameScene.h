@@ -33,6 +33,7 @@ public:
 	// 02_12 26枚目	デスフラグのgetter
 	bool IsFinished() const { return finished_; }
 
+
 private:
 	// 02_12 4枚目 ゲームのフェーズ（型）
 	enum class Phase {

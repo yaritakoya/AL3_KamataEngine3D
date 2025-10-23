@@ -60,7 +60,8 @@ public:
 
 	WorldTransform attackWorldTransform_;
 	void DrawAttackHitboxObj();
-
+	void AddBounce();
+	void UpdateBounce();
 
 private:
 	// ワールド変換データ
@@ -147,4 +148,11 @@ private:
 	float targetY_ = 3.0f;
 	float moveTimer_ = 0.0f;
 	bool isMoving_ = false;
+
+	// バウンド演出用
+	bool isBouncing_ = false;
+	float bounceTimer_ = 0.0f;
+	float bounceDuration_ = 0.3f; // 0.3秒で上昇→下降
+	float bounceHeight_ = 0.8f;   // 上にどれくらい上がるか
+	float bounceStartY_ = 0.0f;
 };

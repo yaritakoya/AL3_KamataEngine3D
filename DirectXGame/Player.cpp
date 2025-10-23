@@ -449,6 +449,8 @@ void Player::Update() {
 			attackTimer_ = 0.0f;
 	}
 
+	UpdateBounce();
+
 }
 
 void Player::Draw() {
@@ -537,4 +539,31 @@ void Player::DrawAttackHitboxObj() {
 
 	// モデルを描画（Playerと同じ描画方法）
 	model_->Draw(attackWorldTransform_, *camera_);
+}
+
+void Player::AddBounce() {
+	if (!isBouncing_) {
+		isBouncing_ = true;
+		bounceTimer_ = 0.0f;
+		bounceStartY_ = worldTransform_.translation_.y;
+	}
+}
+
+void Player::UpdateBounce() {
+	if (!isBouncing_)
+		return;
+
+	bounceTimer_ += 1.0f / 60.0f; // 60fps前提
+	float t = bounceTimer_ / bounceDuration_;
+
+	if (t >= 1.0f) {
+		// 完了：元の位置に戻す
+		worldTransform_.translation_.y = bounceStartY_;
+		isBouncing_ = false;
+		return;
+	}
+
+	// 上昇→下降のイージング（sin波形）
+	float offset = std::sin(t * std::numbers::pi_v<float>) * bounceHeight_;
+	worldTransform_.translation_.y = bounceStartY_ + offset;
 }

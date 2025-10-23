@@ -240,10 +240,19 @@ void GameScene::Update() {
 	skydome_->Update();
 	CController_->Update();
 
-	// 02_09 12枚目 敵更新 → 02_10 7枚目で更新
-	//	enemy_->Update();
+	// 敵の更新
 	for (Enemy* enemy : enemies_) {
 		enemy->Update();
+	}
+
+	// ★左端チェック & リスポーン
+	for (Enemy* enemy : enemies_) {
+		Vector3 pos = enemy->GetWorldPosition();
+		if (pos.x <= 0.0f) {
+			pos.x = 30.0f;
+			pos.y = (rand() % 2 == 0) ? 3.0f : 9.0f;
+			enemy->SetWorldPosition(pos);
+		}
 	}
 
 	for (Enemy* enemy : enemies_) {
@@ -399,18 +408,19 @@ void GameScene::CheckAllCollisions() {
 			float halfWidth = attackWidth * 0.5f;
 			float quarterWidth = halfWidth * 0.5f;
 
-			// ※本来削除対象を集めていたリストは残すが使わない
+			// 元々の削除対象リスト（コメント化せずそのまま保持）
 			std::vector<Enemy*> toRemove;
 
 			for (Enemy* enemy : enemies_) {
 				AABB enemyAABB = enemy->GetAABB();
 				if (IsCollision(attackAABB, enemyAABB)) {
 
-					// ---------- ★スコア判定 ----------
+					// ★ ヒット位置（敵の中心）
 					Vector3 enemyPos = enemy->GetWorldPosition();
 					float distX = enemyPos.x - attackCenterX;
 					float absDist = fabsf(distX);
 
+					// ★ 判定（スコア加算）
 					if (absDist < quarterWidth * 0.5f) {
 						score_ += 2;
 						// OutputDebugStringA("PERFECT\n");
@@ -421,22 +431,24 @@ void GameScene::CheckAllCollisions() {
 						// OutputDebugStringA("BAD\n");
 					}
 
-					// ---------- ★エフェクト（従来通り） ----------
+					// ★ エフェクト発生（従来通り）
 					DeathParticles* enemyEffect = new DeathParticles;
 					enemyEffect->Initialize(deathParticle_model_, &camera_, enemyPos);
 					enemyDeathParticles_.push_back(enemyEffect);
 
-					// ---------- ★削除の代わりに右端へワープ ----------
-					float respawnX = 30.0f;
-					enemyPos.x = respawnX;
+					// ★ 敵を右端へワープ（Yランダム）
+					enemyPos.x = 30.0f;
+					enemyPos.y = (rand() % 2 == 0) ? 3.0f : 9.0f;
 					enemy->SetWorldPosition(enemyPos);
+					
+					player_->AddBounce();
 
-					// ---------- ★元の削除処理はコメントアウトで残す ----------
+					// ★ 削除処理は残すがコメントアウト
 					// toRemove.push_back(enemy);
 				}
 			}
 
-			// ▼▼▼ 元の削除処理はコメントアウトして保持 ▼▼▼
+			// ▼削除処理そのものはコメントアウトして保持▼
 			/*
 			for (Enemy* e : toRemove) {
 			    auto it = std::find(enemies_.begin(), enemies_.end(), e);
