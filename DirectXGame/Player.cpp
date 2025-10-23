@@ -80,27 +80,30 @@ void Player::TryStartAttack() {
 }
 
 AABB Player::GetAttackAABB() const {
-	AABB aabb;
-	Vector3 p = worldTransform_.translation_;
+    AABB aabb;
+    Vector3 p = worldTransform_.translation_;
 
-	float dir = (lrDirection_ == LRDirection::kRight) ? +1.0f : -1.0f;
-	float halfRange = kAttackRange * 0.5f;
-	float halfHeight = kAttackHeight * 0.5f;
-	float halfDepth = kAttackDepth * 0.5f;
+    float dir = (lrDirection_ == LRDirection::kRight) ? +1.0f : -1.0f;
+    float halfRange = kAttackRange * 0.5f;
+    float halfHeight = kAttackHeight * 0.5f;
+    float halfDepth = kAttackDepth * 0.5f;
+    float offsetX = 1.5f;
 
-	// ★ 追加：マップチップ1.5マス右にずらす
-	float offsetX = 1.5f;
+    // ★ バウンド中は攻撃判定を固定高さに
+    float attackY = isBouncing_ ? attackBaseY_ : p.y;
 
-	// 中心を前方方向＋1.5マス分ずらす
-	Vector3 center = {
-	    p.x + dir * (0.5f + halfRange) + offsetX, // ← ここで右に1.5マス分加算
-	    p.y, p.z};
+    Vector3 center = {
+        p.x + dir * (0.5f + halfRange) + offsetX,
+        attackY,
+        p.z
+    };
 
-	aabb.min = {center.x - halfRange, center.y - halfHeight, center.z - halfDepth};
-	aabb.max = {center.x + halfRange, center.y + halfHeight, center.z + halfDepth};
+    aabb.min = {center.x - halfRange, center.y - halfHeight, center.z - halfDepth};
+    aabb.max = {center.x + halfRange, center.y + halfHeight, center.z + halfDepth};
 
-	return aabb;
+    return aabb;
 }
+
 
 
 // 02_07 スライド13枚目
@@ -465,18 +468,17 @@ void Player::Draw() {
 }
 
 
-// --- 攻撃範囲をデバッグ描画する関数 ---
 void Player::DrawAttackAABB() {
-	if (!IsAttacking())
+	// 攻撃中かつ上下移動中でないときのみデバッグ表示
+	if (!IsAttacking() || isMoving_)
 		return;
 
 	AABB atk = GetAttackAABB();
 
-	ImGui::Begin("Debug"); // ← これがないと CurrentWindow が null
+	ImGui::Begin("Debug");
 	ImGui::GetWindowDrawList()->AddRect(ImVec2(atk.min.x * 50 + 640, -atk.min.y * 50 + 360), ImVec2(atk.max.x * 50 + 640, -atk.max.y * 50 + 360), IM_COL32(255, 0, 0, 255), 0.0f, 0, 2.0f);
 	ImGui::End();
 }
-
 
 // 02_10 10枚目
 Vector3 Player::GetWorldPosition() {
@@ -488,7 +490,6 @@ Vector3 Player::GetWorldPosition() {
 	worldPos.z = worldTransform_.matWorld_.m[3][2];
 	return worldPos;
 }
-
 // 02_10 14枚目
 AABB Player::GetAABB() {
 
@@ -513,8 +514,9 @@ void Player::OnCollision(const Enemy* enemy) {
 }
 
 void Player::DrawAttackHitboxObj() {
-	if (!IsAttacking())
-		return; // 攻撃中のみ
+	// 攻撃中かつ上下移動中でないときのみ描画
+	if (!IsAttacking() || isMoving_)
+		return; // ← ここに isMoving_ チェックを追加
 
 	// 攻撃範囲のAABBを取得
 	AABB attackAABB = GetAttackAABB();
@@ -526,28 +528,35 @@ void Player::DrawAttackHitboxObj() {
 	    (attackAABB.min.z + attackAABB.max.z) * 0.5f,
 	};
 
-	// ワールド変換を初期化
 	attackWorldTransform_.Initialize();
 	attackWorldTransform_.scale_ = worldTransform_.scale_;
 	attackWorldTransform_.rotation_ = worldTransform_.rotation_;
 	attackWorldTransform_.translation_ = center;
 
-	// 行列を手動で作成してGPUへ転送
 	attackWorldTransform_.matWorld_ = MakeAffineMatrix(attackWorldTransform_.scale_, attackWorldTransform_.rotation_, attackWorldTransform_.translation_);
-
-	attackWorldTransform_.TransferMatrix(); // なければこの行は削除
+	attackWorldTransform_.TransferMatrix();
 
 	// モデルを描画（Playerと同じ描画方法）
 	model_->Draw(attackWorldTransform_, *camera_);
 }
 
+
+
 void Player::AddBounce() {
-	if (!isBouncing_) {
-		isBouncing_ = true;
-		bounceTimer_ = 0.0f;
-		bounceStartY_ = worldTransform_.translation_.y;
-	}
+	// X,Zはその場のまま
+	bounceStartY_ = worldTransform_.translation_.y;
+
+	// バウンド前の高さを固定（攻撃用）
+	attackBaseY_ = bounceStartY_;
+
+	// バウンド中でも再バウンド可能（位置を元に戻して再開始）
+	worldTransform_.translation_.y = bounceStartY_;
+
+	isBouncing_ = true;
+	bounceTimer_ = 0.0f;
 }
+
+
 
 void Player::UpdateBounce() {
 	if (!isBouncing_)
@@ -566,4 +575,9 @@ void Player::UpdateBounce() {
 	// 上昇→下降のイージング（sin波形）
 	float offset = std::sin(t * std::numbers::pi_v<float>) * bounceHeight_;
 	worldTransform_.translation_.y = bounceStartY_ + offset;
+}
+
+void Player::CancelAttack() {
+	// 攻撃タイマーを強制終了
+	attackTimer_ = 0.0f;
 }

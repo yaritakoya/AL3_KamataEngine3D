@@ -107,7 +107,7 @@ void GameScene::Initialize() {
 	// 02_09 10枚目 敵クラス → 02_10の5枚目で削除
 	//	enemy_ = new Enemy();
 	// 02_09 10枚目 敵モデル
-	enemy_model_ = Model::CreateFromOBJ("enemy");
+	enemy_model_ = Model::CreateFromOBJ("notu");
 	// 02_09 10枚目 敵位置決めて敵クラス初期化 → 02_10の5枚目で削除
 	//	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(14, 18);
 	// enemy_->Initialize(enemy_model_, &camera_, enemyPosition);
@@ -442,6 +442,8 @@ void GameScene::CheckAllCollisions() {
 					enemy->SetWorldPosition(enemyPos);
 					
 					player_->AddBounce();
+
+					player_->CancelAttack();
 
 					// ★ 削除処理は残すがコメントアウト
 					// toRemove.push_back(enemy);

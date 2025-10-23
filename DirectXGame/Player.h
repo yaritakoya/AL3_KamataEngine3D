@@ -63,6 +63,9 @@ public:
 	void AddBounce();
 	void UpdateBounce();
 
+	void CancelAttack();
+
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
@@ -149,10 +152,13 @@ private:
 	float moveTimer_ = 0.0f;
 	bool isMoving_ = false;
 
-	// バウンド演出用
+// バウンド演出用
 	bool isBouncing_ = false;
 	float bounceTimer_ = 0.0f;
-	float bounceDuration_ = 0.3f; // 0.3秒で上昇→下降
-	float bounceHeight_ = 0.8f;   // 上にどれくらい上がるか
+	float bounceDuration_ = 0.3f;
+	float bounceHeight_ = 0.8f;
 	float bounceStartY_ = 0.0f;
+
+	// 攻撃判定固定用（バウンド前のYを保持）
+	float attackBaseY_ = 0.0f;
 };
