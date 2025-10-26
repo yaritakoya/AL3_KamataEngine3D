@@ -74,17 +74,17 @@ void GameScene::Initialize() {
 
 	// プレイヤーモデル
 	player_model_ = Model::CreateFromOBJ("player");
+	laneModel_ = Model::CreateFromOBJ("lane");
 	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
-
 	// Player 初期化
 	player_ = new Player();
-	player_->Initialize(player_model_, &camera_, {4.0f, 2.0f, 0.0f});
+	player_->Initialize(player_model_, laneModel_, &camera_, {4.0f, 2.0f, 0.0f});
 
 	// Player の位置を取得
 	Vector3 playerPos = player_->GetWorldPosition();
 
 	// Lane 初期化（Player の位置を渡す）
-	laneModel_ = Model::CreateFromOBJ("lane");
+
 	lane_ = new Lane();
 	lane_->Initialize(laneModel_, playerPos);
 
@@ -440,7 +440,7 @@ void GameScene::CheckAllCollisions() {
 					enemyPos.x = 30.0f;
 					enemyPos.y = (rand() % 2 == 0) ? 3.0f : 9.0f;
 					enemy->SetWorldPosition(enemyPos);
-					
+
 					player_->AddBounce();
 
 					player_->CancelAttack();

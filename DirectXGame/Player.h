@@ -21,7 +21,7 @@ public:
 	enum Corner { kRightBottom, kLeftBottom, kRightTop, kLeftTop, kNumCorner };
 
 	/// 初期化
-	void Initialize(Model* model, Camera* camera, const Vector3& position);
+	void Initialize(Model* model,Model* laneModel, Camera* camera, const Vector3& position);
 
 	/// 更新
 	void Update();
@@ -161,4 +161,6 @@ private:
 
 	// 攻撃判定固定用（バウンド前のYを保持）
 	float attackBaseY_ = 0.0f;
+
+	Model* laneModel_ = nullptr;
 };

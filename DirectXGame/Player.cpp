@@ -9,16 +9,14 @@
 #include <numbers>
 
 // EaseOutQuart関数（0〜1 のtを渡す）
-float EaseOutQuart(float t) { 
-	return 1 - powf(1 - t, 4); 
-}
+float EaseOutQuart(float t) { return 1 - powf(1 - t, 4); }
 
-
-void Player::Initialize(Model* model, Camera* camera, const Vector3& position) {
+void Player::Initialize(Model* model, Model* laneModel, Camera* camera, const Vector3& position) {
 
 	assert(model);
 	// モデル
 	model_ = model;
+	laneModel_ = laneModel;
 
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
@@ -33,7 +31,6 @@ void Player::Initialize(Model* model, Camera* camera, const Vector3& position) {
 	// 行列更新
 	WorldTransformUpdate(worldTransform_);
 }
-
 
 void Player::InputMove() {
 	Input* input = Input::GetInstance();
@@ -59,7 +56,6 @@ void Player::InputMove() {
 	// ←→入力による移動は削除（左右移動禁止）
 }
 
-
 // --- 攻撃関連実装 ---
 
 void Player::TryStartAttack() {
@@ -73,31 +69,25 @@ void Player::TryStartAttack() {
 }
 
 AABB Player::GetAttackAABB() const {
-    AABB aabb;
-    Vector3 p = worldTransform_.translation_;
+	AABB aabb;
+	Vector3 p = worldTransform_.translation_;
 
-    float dir = (lrDirection_ == LRDirection::kRight) ? +1.0f : -1.0f;
-    float halfRange = kAttackRange * 0.5f;
-    float halfHeight = kAttackHeight * 0.5f;
-    float halfDepth = kAttackDepth * 0.5f;
-    float offsetX = 1.5f;
+	float dir = (lrDirection_ == LRDirection::kRight) ? +1.0f : -1.0f;
+	float halfRange = kAttackRange * 0.5f;
+	float halfHeight = kAttackHeight * 0.5f;
+	float halfDepth = kAttackDepth * 0.5f;
+	float offsetX = 1.5f;
 
-    // ★ バウンド中は攻撃判定を固定高さに
-    float attackY = isBouncing_ ? attackBaseY_ : p.y;
+	// ★ バウンド中は攻撃判定を固定高さに
+	float attackY = isBouncing_ ? attackBaseY_ : p.y;
 
-    Vector3 center = {
-        p.x + dir * (0.5f + halfRange) + offsetX,
-        attackY,
-        p.z
-    };
+	Vector3 center = {p.x + dir * (0.5f + halfRange) + offsetX, attackY, p.z};
 
-    aabb.min = {center.x - halfRange, center.y - halfHeight, center.z - halfDepth};
-    aabb.max = {center.x + halfRange, center.y + halfHeight, center.z + halfDepth};
+	aabb.min = {center.x - halfRange, center.y - halfHeight, center.z - halfDepth};
+	aabb.max = {center.x + halfRange, center.y + halfHeight, center.z + halfDepth};
 
-    return aabb;
+	return aabb;
 }
-
-
 
 // 02_07 スライド13枚目
 void Player::CheckMapCollision(CollisionMapInfo& info) {
@@ -106,7 +96,6 @@ void Player::CheckMapCollision(CollisionMapInfo& info) {
 	CheckMapCollisionRight(info);
 	CheckMapCollisionLeft(info);
 }
-
 
 // 02_08スライド14枚目 設置状態の切り替え処理
 void Player::UpdateOnGround(const CollisionMapInfo& info) {
@@ -397,7 +386,7 @@ void Player::Update() {
 	// 入力（上下のみ）
 	InputMove();
 
-	    // イージング移動中の処理
+	// イージング移動中の処理
 	if (isMoving_) {
 		const float duration = 0.2f;           // 0.2秒で完了（調整可）
 		moveTimer_ += 1.0f / 60.0f / duration; // 60fps基準
@@ -435,7 +424,7 @@ void Player::Update() {
 	// ワールド行列更新
 	WorldTransformUpdate(worldTransform_);
 
-    // 攻撃開始トライ（Space押下）
+	// 攻撃開始トライ（Space押下）
 	TryStartAttack();
 
 	// 攻撃タイマー更新
@@ -446,7 +435,6 @@ void Player::Update() {
 	}
 
 	UpdateBounce();
-
 }
 
 void Player::Draw() {
@@ -459,7 +447,6 @@ void Player::Draw() {
 	// 既存のAABB描画（デバッグライン用）
 	DrawAttackAABB();
 }
-
 
 void Player::DrawAttackAABB() {
 	// 攻撃中かつ上下移動中でないときのみデバッグ表示
@@ -507,32 +494,43 @@ void Player::OnCollision(const Enemy* enemy) {
 }
 
 void Player::DrawAttackHitboxObj() {
-	// 攻撃中かつ上下移動中でないときのみ描画
-	if (!IsAttacking() || isMoving_)
-		return; // ← ここに isMoving_ チェックを追加
+	// ★攻撃条件をすべて外す：常に描画
+	// if (!IsAttacking() || isMoving_)
+	//     return;
 
-	// 攻撃範囲のAABBを取得
+	// 攻撃AABBを基準に描画位置を決める
 	AABB attackAABB = GetAttackAABB();
 
-	// 中心座標を計算
 	Vector3 center = {
 	    (attackAABB.min.x + attackAABB.max.x) * 0.5f,
 	    (attackAABB.min.y + attackAABB.max.y) * 0.5f,
 	    (attackAABB.min.z + attackAABB.max.z) * 0.5f,
 	};
 
+	// ワールド変換を設定
 	attackWorldTransform_.Initialize();
-	attackWorldTransform_.scale_ = worldTransform_.scale_;
-	attackWorldTransform_.rotation_ = worldTransform_.rotation_;
+
+	// ★一時的に大きくしてカメラから見えるようにする
+	attackWorldTransform_.scale_ = {1.5f, 1.5f, 1.5f};
+
+	// ★カメラに向けて少し前に出す（奥に埋まるのを防ぐ）
 	attackWorldTransform_.translation_ = center;
+
+	attackWorldTransform_.rotation_ = worldTransform_.rotation_;
 
 	attackWorldTransform_.matWorld_ = MakeAffineMatrix(attackWorldTransform_.scale_, attackWorldTransform_.rotation_, attackWorldTransform_.translation_);
 	attackWorldTransform_.TransferMatrix();
 
-	// モデルを描画（Playerと同じ描画方法）
-	model_->Draw(attackWorldTransform_, *camera_);
-}
+	// ★laneモデルを優先して描画
+	if (laneModel_) {
+		laneModel_->Draw(attackWorldTransform_, *camera_);
+	} else {
+		model_->Draw(attackWorldTransform_, *camera_);
+	}
 
+	// デバッグ出力（ちゃんと呼ばれているか確認）
+	OutputDebugStringA("Drawing LANE model (always visible)\n");
+}
 
 
 void Player::AddBounce() {
@@ -548,8 +546,6 @@ void Player::AddBounce() {
 	isBouncing_ = true;
 	bounceTimer_ = 0.0f;
 }
-
-
 
 void Player::UpdateBounce() {
 	if (!isBouncing_)
