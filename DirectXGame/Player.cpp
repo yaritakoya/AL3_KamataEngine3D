@@ -56,16 +56,9 @@ void Player::InputMove() {
 		}
 	}
 
-	// 左右移動は従来通り
-	const float moveSpeed = 0.1f;
-	if (input->PushKey(DIK_RIGHT)) {
-		worldTransform_.translation_.x += moveSpeed;
-		lrDirection_ = LRDirection::kRight;
-	} else if (input->PushKey(DIK_LEFT)) {
-		worldTransform_.translation_.x -= moveSpeed;
-		lrDirection_ = LRDirection::kLeft;
-	}
+	// ←→入力による移動は削除（左右移動禁止）
 }
+
 
 // --- 攻撃関連実装 ---
 

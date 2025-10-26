@@ -155,7 +155,7 @@ private:
 // バウンド演出用
 	bool isBouncing_ = false;
 	float bounceTimer_ = 0.0f;
-	float bounceDuration_ = 0.3f;
+	float bounceDuration_ = 0.2f;
 	float bounceHeight_ = 0.8f;
 	float bounceStartY_ = 0.0f;
 
