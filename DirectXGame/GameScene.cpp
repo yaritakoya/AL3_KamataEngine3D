@@ -62,6 +62,11 @@ void GameScene::Initialize() {
 	modelSkydome_ = Model::CreateFromOBJ("SkyDome", true);
 	skydome_->Initialize(modelSkydome_, &camera_);
 
+	//サウンドデータの読み込み
+	soundDataHandle_ = Audio::GetInstance()->LoadWave("BandLabSong.wav");
+	// 音声再生
+	Audio::GetInstance()->PlayWave(soundDataHandle_);
+
 	// 02_04マップチップ
 	mapChipField_ = new MapChipField;
 	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");

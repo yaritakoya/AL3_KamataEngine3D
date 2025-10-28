@@ -1,13 +1,13 @@
 #pragma once
-#include "Fade.h"
-#include "lane.h"
-#include "Enemy.h"
-#include "Player.h"
-#include "skydome.h"
-#include "MapChipField.h"
-#include "KamataEngine.h"
-#include "DeathParticles.h"
 #include "CameraController.h"
+#include "DeathParticles.h"
+#include "Enemy.h"
+#include "Fade.h"
+#include "KamataEngine.h"
+#include "MapChipField.h"
+#include "Player.h"
+#include "lane.h"
+#include "skydome.h"
 #include <vector>
 
 using namespace KamataEngine;
@@ -33,13 +33,12 @@ public:
 	// 02_12 26枚目	デスフラグのgetter
 	bool IsFinished() const { return finished_; }
 
-
 private:
 	// 02_12 4枚目 ゲームのフェーズ（型）
 	enum class Phase {
-		kFadeIn, // フェードイン
-		kPlay,  // ゲームプレイ
-		kDeath, // デス演出
+		kFadeIn,  // フェードイン
+		kPlay,    // ゲームプレイ
+		kDeath,   // デス演出
 		kFadeOut, // フェードアウト
 	};
 
@@ -74,7 +73,7 @@ private:
 	Model* block_model_ = nullptr;
 	std::vector<std::vector<WorldTransform*>> worldTransformBlocks_;
 
-	//レーン
+	// レーン
 	Lane* lane_ = nullptr;       // ← Laneクラスのポインタを追加
 	Model* laneModel_ = nullptr; // ← Laneの3Dモデル用
 
@@ -113,5 +112,8 @@ private:
 	// フェード
 	Fade* fade_ = nullptr;
 
-	 int score_ = 0;
+	int score_ = 0;
+
+	// サウンドデータハンドル
+	uint32_t bgmHandle_ = 0;
 };
