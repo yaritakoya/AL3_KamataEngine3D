@@ -455,9 +455,9 @@ void Player::DrawAttackAABB() {
 
 	AABB atk = GetAttackAABB();
 
-	ImGui::Begin("Debug");
-	ImGui::GetWindowDrawList()->AddRect(ImVec2(atk.min.x * 50 + 640, -atk.min.y * 50 + 360), ImVec2(atk.max.x * 50 + 640, -atk.max.y * 50 + 360), IM_COL32(255, 0, 0, 255), 0.0f, 0, 2.0f);
-	ImGui::End();
+	//ImGui::Begin("Debug");
+	//ImGui::GetWindowDrawList()->AddRect(ImVec2(atk.min.x * 50 + 640, -atk.min.y * 50 + 360), ImVec2(atk.max.x * 50 + 640, -atk.max.y * 50 + 360), IM_COL32(255, 0, 0, 255), 0.0f, 0, 2.0f);
+	//ImGui::End();
 }
 
 // 02_10 10枚目

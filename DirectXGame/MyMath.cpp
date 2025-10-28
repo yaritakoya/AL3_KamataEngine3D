@@ -1,5 +1,6 @@
 #include "MyMath.h"
 #include <cmath>
+#include <cassert>
 #include <numbers>
 
 // 02_06の29枚目(CameraControllerのUpdate)で必要
