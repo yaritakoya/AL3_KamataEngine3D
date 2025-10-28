@@ -1,19 +1,25 @@
 #include "GameScene.h"
 #include "KamataEngine.h"
-#include "TitleScene.h" // 02_12 21枚目
+#include "TitleScene.h"
+#include "SelectionScene.h"
+#include "ResultScene.h"
 #include <Windows.h>
 
 using namespace KamataEngine; // これ書いておくとkamataEngine::書かなくてよい
 
 // 02_12 24枚目
 TitleScene* titleScene = nullptr;
+SelectionScene* selectionScene = nullptr;
 GameScene* gameScene = nullptr;
+ResultScene* resultScene = nullptr;
 
 // 02_12 25枚目(Scene sceneまで)
 enum class Scene {
 	kUnknown = 0,
 	kTitle,
+	kSelection,
 	kGame,
+	kResult,
 };
 // 現在シーン（型）
 Scene scene = Scene::kUnknown;
@@ -25,9 +31,19 @@ void ChangeScene() {
 	case Scene::kTitle:
 		if (titleScene->IsFinished()) {
 			// シーン変更
-			scene = Scene::kGame;
+			scene = Scene::kSelection;
 			delete titleScene;
 			titleScene = nullptr;
+			selectionScene = new SelectionScene;
+			selectionScene->Initialize();
+		}
+		break;
+	case Scene::kSelection:
+		if (selectionScene->IsFinished()) {
+			// シーン変更
+			scene = Scene::kGame;
+			delete selectionScene;
+			selectionScene = nullptr;
 			gameScene = new GameScene;
 			gameScene->Initialize();
 		}
@@ -39,6 +55,16 @@ void ChangeScene() {
 			scene = Scene::kTitle;
 			delete gameScene;
 			gameScene = nullptr;
+			resultScene = new ResultScene;
+			resultScene->Initialize();
+		}
+		break;
+	case Scene::kResult:
+		if (resultScene->IsFinished()) {
+			// シーン変更
+			scene = Scene::kTitle;
+			delete resultScene;
+			resultScene = nullptr;
 			titleScene = new TitleScene;
 			titleScene->Initialize();
 		}
@@ -53,8 +79,14 @@ void UpdateScene() {
 	case Scene::kTitle:
 		titleScene->Update();
 		break;
+	case Scene::kSelection:
+		selectionScene->Update();
+		break;
 	case Scene::kGame:
 		gameScene->Update();
+		break;
+	case Scene::kResult:
+		resultScene->Update();
 		break;
 	}
 }
@@ -65,8 +97,14 @@ void DrawScene() {
 	case Scene::kTitle:
 		titleScene->Draw();
 		break;
+	case Scene::kSelection:
+		selectionScene->Draw();
+		break;
 	case Scene::kGame:
 		gameScene->Draw();
+		break;
+	case Scene::kResult:
+		resultScene->Draw();
 		break;
 	}
 }
@@ -100,7 +138,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		imguiManager->Begin();
 
 		// 02_12 21枚目で変更
-		//		titleScene->Update(); //02_12 33枚目で削除
+		// titleScene->Update(); //02_12 33枚目で削除
 
 		// シーン切り替え
 		ChangeScene(); // 02_12 33枚目で追加
@@ -114,7 +152,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		dxCommon->PreDraw();
 
 		// ゲームシーンの描画
-		//		titleScene->Draw(); // 02_12 33枚目で削除
+		// titleScene->Draw(); // 02_12 33枚目で削除
 
 		// シーンの描画
 		DrawScene(); // 02_12 33枚目で追加
@@ -135,7 +173,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// 02_12 35枚目 各種解放
 	delete titleScene;
+	delete selectionScene;
 	delete gameScene;
+	delete resultScene;
 
 	// エンジンの終了処理
 	KamataEngine::Finalize();
