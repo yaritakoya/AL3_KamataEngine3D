@@ -89,6 +89,28 @@ AABB Player::GetAttackAABB() const {
 	return aabb;
 }
 
+AABB Player::GetAttackAABB_Upper() const {
+	AABB aabb;
+	Vector3 p = worldTransform_.translation_;
+
+	float dir = (lrDirection_ == LRDirection::kRight) ? +1.0f : -1.0f;
+	float halfRange = kAttackRange * 0.5f;
+	float halfHeight = kAttackHeight * 0.5f;
+	float halfDepth = kAttackDepth * 0.5f;
+	float offsetX = 1.5f;
+
+	// ★攻撃判定を上の固定位置に配置
+	float attackY = 9.0f;
+
+	Vector3 center = {p.x + dir * (0.5f + halfRange) + offsetX, attackY, p.z};
+
+	aabb.min = {center.x - halfRange, center.y - halfHeight, center.z - halfDepth};
+	aabb.max = {center.x + halfRange, center.y + halfHeight, center.z + halfDepth};
+
+	return aabb;
+}
+
+
 // 02_07 スライド13枚目
 void Player::CheckMapCollision(CollisionMapInfo& info) {
 	CheckMapCollisionUp(info);
@@ -444,6 +466,9 @@ void Player::Draw() {
 	// 攻撃範囲（OBJで可視化）
 	DrawAttackHitboxObj();
 
+	// ★ 上方向の攻撃範囲モデル
+	DrawAttackHitboxObj_Upper();
+
 	// 既存のAABB描画（デバッグライン用）
 	DrawAttackAABB();
 }
@@ -455,9 +480,9 @@ void Player::DrawAttackAABB() {
 
 	AABB atk = GetAttackAABB();
 
-	//ImGui::Begin("Debug");
-	//ImGui::GetWindowDrawList()->AddRect(ImVec2(atk.min.x * 50 + 640, -atk.min.y * 50 + 360), ImVec2(atk.max.x * 50 + 640, -atk.max.y * 50 + 360), IM_COL32(255, 0, 0, 255), 0.0f, 0, 2.0f);
-	//ImGui::End();
+	// ImGui::Begin("Debug");
+	// ImGui::GetWindowDrawList()->AddRect(ImVec2(atk.min.x * 50 + 640, -atk.min.y * 50 + 360), ImVec2(atk.max.x * 50 + 640, -atk.max.y * 50 + 360), IM_COL32(255, 0, 0, 255), 0.0f, 0, 2.0f);
+	// ImGui::End();
 }
 
 // 02_10 10枚目
@@ -494,44 +519,71 @@ void Player::OnCollision(const Enemy* enemy) {
 }
 
 void Player::DrawAttackHitboxObj() {
-	// ★攻撃条件をすべて外す：常に描画
-	// if (!IsAttacking() || isMoving_)
-	//     return;
-
-	// 攻撃AABBを基準に描画位置を決める
+	// 攻撃範囲のAABBを取得
 	AABB attackAABB = GetAttackAABB();
 
+	// AABBの中心を計算
 	Vector3 center = {
 	    (attackAABB.min.x + attackAABB.max.x) * 0.5f,
 	    (attackAABB.min.y + attackAABB.max.y) * 0.5f,
 	    (attackAABB.min.z + attackAABB.max.z) * 0.5f,
 	};
 
-	// ワールド変換を設定
+	// ★ 下レーン固定（プレイヤーが動いてもY座標は変わらない）
+	center.y = 3.0f;
+
 	attackWorldTransform_.Initialize();
-
-	// ★一時的に大きくしてカメラから見えるようにする
 	attackWorldTransform_.scale_ = {1.5f, 1.5f, 1.5f};
-
-	// ★カメラに向けて少し前に出す（奥に埋まるのを防ぐ）
 	attackWorldTransform_.translation_ = center;
-
 	attackWorldTransform_.rotation_ = worldTransform_.rotation_;
 
 	attackWorldTransform_.matWorld_ = MakeAffineMatrix(attackWorldTransform_.scale_, attackWorldTransform_.rotation_, attackWorldTransform_.translation_);
 	attackWorldTransform_.TransferMatrix();
 
-	// ★laneモデルを優先して描画
+	// ★ laneModel_を使用して描画
 	if (laneModel_) {
 		laneModel_->Draw(attackWorldTransform_, *camera_);
 	} else {
 		model_->Draw(attackWorldTransform_, *camera_);
 	}
 
-	// デバッグ出力（ちゃんと呼ばれているか確認）
-	OutputDebugStringA("Drawing LANE model (always visible)\n");
+	OutputDebugStringA("Drawing LANE model (fixed lower lane)\n");
 }
 
+
+// 上方向の攻撃判定をモデルで描画
+void Player::DrawAttackHitboxObj_Upper() {
+
+	// ★ 上方向の攻撃AABBを取得
+	AABB upperAABB = GetAttackAABB_Upper();
+
+	// AABBの中心を計算
+	Vector3 upperCenter = {
+	    (upperAABB.min.x + upperAABB.max.x) * 0.5f,
+	    (upperAABB.min.y + upperAABB.max.y) * 0.5f,
+	    (upperAABB.min.z + upperAABB.max.z) * 0.5f,
+	};
+
+	// ワールド変換を設定
+	attackWorldTransform_Upper_.Initialize();
+	attackWorldTransform_Upper_.scale_ = {1.5f, 1.5f, 1.5f};
+	attackWorldTransform_Upper_.translation_ = upperCenter;
+	attackWorldTransform_Upper_.rotation_ = worldTransform_.rotation_;
+
+	attackWorldTransform_Upper_.matWorld_ = MakeAffineMatrix(attackWorldTransform_Upper_.scale_, attackWorldTransform_Upper_.rotation_, attackWorldTransform_Upper_.translation_);
+
+	attackWorldTransform_Upper_.TransferMatrix();
+
+	// ★ laneModel_を使用して描画（既存と同じ）
+	if (laneModel_) {
+		laneModel_->Draw(attackWorldTransform_Upper_, *camera_);
+	} else {
+		model_->Draw(attackWorldTransform_Upper_, *camera_);
+	}
+
+	// デバッグ出力
+	OutputDebugStringA("Drawing UPPER LANE model\n");
+}
 
 void Player::AddBounce() {
 	// X,Zはその場のまま

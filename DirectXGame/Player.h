@@ -21,7 +21,7 @@ public:
 	enum Corner { kRightBottom, kLeftBottom, kRightTop, kLeftTop, kNumCorner };
 
 	/// 初期化
-	void Initialize(Model* model,Model* laneModel, Camera* camera, const Vector3& position);
+	void Initialize(Model* model, Model* laneModel, Camera* camera, const Vector3& position);
 
 	/// 更新
 	void Update();
@@ -53,10 +53,12 @@ public:
 	Vector3 GetWorldPosition() const { return worldTransform_.translation_; }
 	Vector3 GetWorldRotation() const { return worldTransform_.rotation_; }
 
-    void TryStartAttack();                                   // Spaceキーで攻撃開始
+	void TryStartAttack();                                   // Spaceキーで攻撃開始
 	bool IsAttacking() const { return attackTimer_ > 0.0f; } // 攻撃中判定
 	AABB GetAttackAABB() const;                              // 攻撃当たり判定取得
 	void DrawAttackAABB();                                   // ← 攻撃範囲をデバッグ描画する関数を追加！
+	AABB GetAttackAABB_Upper() const;                        // ★新規追加
+	void DrawAttackHitboxObj_Upper();                        // ★新規追加
 
 	WorldTransform attackWorldTransform_;
 	void DrawAttackHitboxObj();
@@ -65,10 +67,10 @@ public:
 
 	void CancelAttack();
 
-
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
+	WorldTransform attackWorldTransform_Upper_; // ★新規追加
 	// モデル
 	Model* model_ = nullptr;
 	// テクスチャハンドル
@@ -139,7 +141,7 @@ private:
 	// 02_12 11枚目 デスフラグ
 	bool isDead_ = false;
 
-    // 攻撃関連（追加）
+	// 攻撃関連（追加）
 	static inline const float kAttackRange = 0.8f;     // 前方距離
 	static inline const float kAttackHeight = 0.8f;    // 高さ
 	static inline const float kAttackDepth = 0.8f;     // 奥行き
@@ -152,7 +154,7 @@ private:
 	float moveTimer_ = 0.0f;
 	bool isMoving_ = false;
 
-// バウンド演出用
+	// バウンド演出用
 	bool isBouncing_ = false;
 	float bounceTimer_ = 0.0f;
 	float bounceDuration_ = 0.2f;
