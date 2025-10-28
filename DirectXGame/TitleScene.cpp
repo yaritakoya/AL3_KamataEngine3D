@@ -5,13 +5,15 @@
 TitleScene::~TitleScene() {
 	delete modelPlayer_;
 	delete modelTitle_;
+	delete modelBackTitle_;
 	delete fade_; 
 }
 
 void TitleScene::Initialize() {
 
-	modelTitle_ = Model::CreateFromOBJ("titleFont", true);
+	modelTitle_ = Model::CreateFromOBJ("titleFont");
 	modelPlayer_ = Model::CreateFromOBJ("player");
+	modelBackTitle_ = Model::CreateFromOBJ("title");
 
 	// カメラ初期化
 	camera_.Initialize();
@@ -95,6 +97,7 @@ void TitleScene::Draw() {
 
 	modelTitle_->Draw(worldTransformTitle_, camera_);
 	modelPlayer_->Draw(worldTransformPlayer_, camera_);
+	modelBackTitle_->Draw(worldTransformTitle_, camera_);
 
 	Model::PostDraw();
 

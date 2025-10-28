@@ -31,10 +31,12 @@ private:
 	// ビュープロジェクション
 	Camera camera_;
 	WorldTransform worldTransformTitle_;
+	WorldTransform worldTransformBackTitle_;
 	WorldTransform worldTransformPlayer_;
 
 	Model* modelPlayer_ = nullptr;
 	Model* modelTitle_ = nullptr;
+	Model* modelBackTitle_ = nullptr;
 
 	float counter_ = 0.0f;
 	// 02_12 26枚目
