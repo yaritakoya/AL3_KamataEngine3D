@@ -55,8 +55,8 @@ void ChangeScene() {
 			scene = Scene::kTitle;
 			delete gameScene;
 			gameScene = nullptr;
-			resultScene = new ResultScene;
-			resultScene->Initialize();
+			titleScene = new TitleScene;
+			titleScene->Initialize();
 		}
 		break;
 	case Scene::kResult:
