@@ -385,6 +385,7 @@ void GameScene::CheckAllCollisions() {
 	AABB aabb1, aabb2;
 
 #pragma region 自キャラと敵キャラの当たり判定
+	
 	{
 		// 自キャラのAABBを取得
 		aabb1 = player_->GetAABB();
@@ -398,6 +399,7 @@ void GameScene::CheckAllCollisions() {
 			}
 		}
 	}
+
 #pragma endregion
 
 #pragma region プレイヤー攻撃と敵キャラの当たり判定
