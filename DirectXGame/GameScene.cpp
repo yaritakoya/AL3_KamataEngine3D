@@ -116,25 +116,40 @@ void GameScene::Initialize() {
 	// 02_09 10枚目 敵位置決めて敵クラス初期化 → 02_10の5枚目で削除
 	//	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(14, 18);
 	// enemy_->Initialize(enemy_model_, &camera_, enemyPosition);
-	float playerY = player_->GetWorldPosition().y; // プレイヤーの高さに合わせる
+	//float playerY = player_->GetWorldPosition().y; // プレイヤーの高さに合わせる
 
 	// 画面右端から出現（例: x = 50.0f）
 	float startX = 30.0f;
+	//float startY = 0.0f;
 	float startZ = 0.0f;
 
 	// 3体並べる（間隔2.0f）
-	for (int32_t i = 0; i < 3; ++i) {
+	float yList[286] = {
+	    9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f,
+		3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 3.0f,
+		3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f,
+		9.0f, 3.0f, 3.0f, 9.0f, 3.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f,
+		9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f,
+		9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f,
+		3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f
+	};
+
+	for (int i = 0; i < 286; i++) {
 		Enemy* newEnemy = new Enemy();
-
-		Vector3 enemyPosition = {startX + i * 4.0f, playerY, startZ};
-
-		newEnemy->Initialize(enemy_model_, &camera_, enemyPosition);
-
-		// 移動速度を調整するための関数がある場合
-		newEnemy->SetMoveSpeed(0.2f); // ← 速度アップ（デフォルト0.05〜0.1程度なら倍速）
-
+		Vector3 pos = {startX + i * 4.0f, yList[i], startZ};
+		newEnemy->Initialize(enemy_model_, &camera_, pos);
+		newEnemy->SetMoveSpeed(-0.2f);
 		enemies_.push_back(newEnemy);
 	}
+
 
 	// 02_11_16枚目 モデル読み込み
 	deathParticle_model_ = Model::CreateFromOBJ("deathParticle");
