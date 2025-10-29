@@ -122,31 +122,32 @@ void GameScene::Initialize() {
 	float startX = 30.0f;
 	//float startY = 0.0f;
 	float startZ = 0.0f;
+	const int kListMax = 271;
 
 	// 3体並べる（間隔2.0f）
-	float yList[286] = {
-	    9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f,
-		3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 3.0f,
-		3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
-		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f,
-		9.0f, 3.0f, 3.0f, 9.0f, 3.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f,
-		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f,
-		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f,
-		9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f,
-		9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
-		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f,
-		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
-		9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
-		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f,
-		3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
-		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f
+	float yList[kListMax] = {
+	    9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f,
+		3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 3.0f,
+		3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f,
+		3.0f, 3.0f, 9.0f, 3.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f,
+		9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f,
+		3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 9.0f, 9.0f,
+		3.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f, 3.0f, 3.0f, 9.0f, 9.0f, 9.0f, 9.0f, 9.0f,
+		9.0f, 9.0f, 9.0f, 9.0f, 9.0f
 	};
 
-	for (int i = 0; i < 286; i++) {
+	for (int i = 0; i < kListMax; i++) {
 		Enemy* newEnemy = new Enemy();
-		Vector3 pos = {startX + i * 4.0f, yList[i], startZ};
+		Vector3 pos = {startX + i * 8.0f, yList[i], startZ};
 		newEnemy->Initialize(enemy_model_, &camera_, pos);
-		newEnemy->SetMoveSpeed(-0.2f);
+		//newEnemy->SetMoveSpeed(-0.2f);
 		enemies_.push_back(newEnemy);
 	}
 
@@ -324,12 +325,18 @@ void GameScene::Update() {
 	if (deathParticles_) {
 		deathParticles_->Update();
 	}
-	// 敵の死エフェクトを更新（Player の deathParticles_ と同じように扱う）
-	for (auto it = enemyDeathParticles_.begin(); it != enemyDeathParticles_.end();) {
-		(*it)->Update();
-		if ((*it)->IsFinished()) {
-			delete *it;
-			it = enemyDeathParticles_.erase(it);
+	
+	// 敵がプレイヤー判定ラインを通過したら消す（リスポーンしない）
+	Vector3 playerPos = player_->GetWorldPosition();
+
+	for (auto it = enemies_.begin(); it != enemies_.end();) {
+		Enemy* enemy = *it;
+		Vector3 pos = enemy->GetWorldPosition();
+
+		// 判定ライン = プレイヤーの目の前
+		if (pos.x <= playerPos.x) {
+			delete enemy;
+			it = enemies_.erase(it);
 		} else {
 			++it;
 		}
@@ -362,11 +369,13 @@ void GameScene::Draw() {
 		}
 	}
 
-	// 02_09 12枚目 敵更新 → 02_10 7枚目で更新
-	//	enemy_->Draw();
-	for (Enemy* enemy : enemies_) {
-		enemy->Draw();
+for (Enemy* enemy : enemies_) {
+		Vector3 pos = enemy->GetWorldPosition();
+		if (pos.x < 31.0f) {
+			enemy->Draw(); // xが31未満のときだけ描画
+		}
 	}
+
 
 	// 既にあるプレイヤー用デスパーティクル描画の直後に追加
 	if (deathParticles_) {
