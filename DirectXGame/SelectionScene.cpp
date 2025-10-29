@@ -3,6 +3,7 @@
 #include <numbers>
 
 SelectionScene::~SelectionScene() {
+	delete titleSprite_;
 	delete modelPlayer_;
 	delete modelTitle_;
 	delete fade_;
@@ -12,6 +13,9 @@ void SelectionScene::Initialize() {
 
 	modelTitle_ = Model::CreateFromOBJ("titleFont", true);
 	modelPlayer_ = Model::CreateFromOBJ("player");
+
+	titleTextureHandle = TextureManager::Load("select.png");
+	titleSprite_ = Sprite::Create(titleTextureHandle, {0, 0});
 
 	// カメラ初期化
 	camera_.Initialize();
@@ -78,6 +82,8 @@ void SelectionScene::Update() {
 
 	camera_.TransferMatrix();
 
+	titleSprite_->SetPosition({0, 0});
+
 	// アフィン変換～DirectXに転送(タイトル座標)
 	WorldTransformUpdate(worldTransformTitle_);
 
@@ -95,6 +101,9 @@ void SelectionScene::Draw() {
 
 	//modelTitle_->Draw(worldTransformTitle_, camera_);
 	//modelPlayer_->Draw(worldTransformPlayer_, camera_);
+	Sprite::PreDraw(commandList);
+	titleSprite_->Draw();
+	Sprite::PostDraw();
 
 	Model::PostDraw();
 

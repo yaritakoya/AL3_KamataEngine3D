@@ -3,17 +3,19 @@
 #include <numbers>
 
 TitleScene::~TitleScene() {
+	delete titleSprite_;
 	delete modelPlayer_;
 	delete modelTitle_;
-	delete modelBackTitle_;
-	delete fade_; 
+	delete fade_;
 }
 
 void TitleScene::Initialize() {
 
 	modelTitle_ = Model::CreateFromOBJ("titleFont");
 	modelPlayer_ = Model::CreateFromOBJ("player");
-	modelBackTitle_ = Model::CreateFromOBJ("title");
+
+	titleTextureHandle = TextureManager::Load("title.png");
+	titleSprite_ = Sprite::Create(titleTextureHandle, {0, 0});
 
 	// カメラ初期化
 	camera_.Initialize();
@@ -36,7 +38,7 @@ void TitleScene::Initialize() {
 
 	worldTransformPlayer_.translation_.y = -10.0f;
 
-	//フェード
+	// フェード
 	fade_ = new Fade();
 	fade_->Initialize();
 	fade_->Start(Fade::Status::FadeIn, 1.0f);
@@ -46,7 +48,7 @@ void TitleScene::Update() {
 
 	switch (phase_) {
 	case TitleScene::Phase::kMain:
-		//タイトルシーンの終了条件
+		// タイトルシーンの終了条件
 		if (Input::GetInstance()->PushKey(DIK_SPACE)) {
 			// フェードアウト開始
 			phase_ = Phase::kFadeOut;
@@ -80,6 +82,8 @@ void TitleScene::Update() {
 
 	camera_.TransferMatrix();
 
+	titleSprite_->SetPosition({0, 0});
+
 	// アフィン変換～DirectXに転送(タイトル座標)
 	WorldTransformUpdate(worldTransformTitle_);
 
@@ -94,13 +98,14 @@ void TitleScene::Draw() {
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
 
 	Model::PreDraw(commandList);
-
 	modelTitle_->Draw(worldTransformTitle_, camera_);
 	modelPlayer_->Draw(worldTransformPlayer_, camera_);
-	modelBackTitle_->Draw(worldTransformTitle_, camera_);
+	Sprite::PreDraw(commandList);
+	titleSprite_->Draw();
+	Sprite::PostDraw();
 
 	Model::PostDraw();
 
-	//フェード
+	// フェード
 	fade_->Draw();
 }

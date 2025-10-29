@@ -1,16 +1,16 @@
 #pragma once
-#include "KamataEngine.h"
 #include "Fade.h"
+#include "KamataEngine.h"
 
 using namespace KamataEngine;
 
 // 02_12 19枚目 タイトルシーン
 class TitleScene {
 public:
-	//シーンのフェーズ
+	// シーンのフェーズ
 	enum class Phase {
 		kFadeIn,  // フェードイン
-		kMain, // メイン部
+		kMain,    // メイン部
 		kFadeOut, // フェードアウト
 	};
 
@@ -42,9 +42,12 @@ private:
 	// 02_12 26枚目
 	bool finished_ = false;
 
-	//フェード
-	Fade* fade_=nullptr;
+	// フェード
+	Fade* fade_ = nullptr;
 
-	//現在のフェーズ
+	// 現在のフェーズ
 	Phase phase_ = Phase::kFadeIn;
+
+	uint32_t titleTextureHandle = 0;
+	Sprite* titleSprite_ = nullptr;
 };

@@ -45,4 +45,7 @@ private:
 
 	// 現在のフェーズ
 	Phase phase_ = Phase::kFadeIn;
+
+	uint32_t titleTextureHandle = 0;
+	Sprite* titleSprite_ = nullptr;
 };
