@@ -110,5 +110,10 @@ private:
 	// フェード
 	Fade* fade_ = nullptr;
 
+	// 一時停止
+	bool isPause_ = false;
+	uint32_t pauseTextureHandle_ = 0;
+	KamataEngine::Sprite* pauseSprite_ = nullptr;
+
 	
 };

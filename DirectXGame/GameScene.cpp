@@ -32,8 +32,10 @@ GameScene::~GameScene() {
 	delete deathParticles_;
 	delete deathParticle_model_;
 
-	//フェード
+	// フェード
 	delete fade_;
+	// pause画像
+	delete pauseSprite_;
 }
 
 void GameScene::Initialize() {
@@ -114,6 +116,11 @@ void GameScene::Initialize() {
 	fade_ = new Fade();
 	fade_->Initialize();
 	fade_->Start(Fade::Status::FadeIn, 1.0f);
+
+	// pause画像
+	pauseTextureHandle_ = TextureManager::Load("pauseSprite.png");
+	// pauseスプライト
+	pauseSprite_ = Sprite::Create(pauseTextureHandle_, {0.0f, 0.0f});
 }
 
 // 02_12 10枚目 GameScene::Update関数で呼び出しておく
@@ -184,91 +191,99 @@ void GameScene::GenerateBlocks() {
 // ゲームシーン更新
 void GameScene::Update() {
 
-	ChangePhase();
+	if (Input::GetInstance()->TriggerKey(DIK_ESCAPE)) {
+		isPause_ = !isPause_;
+	}
 
-	// フェード
-	fade_->Update();
+	if (isPause_ == false) {
 
-	// 02_12 5枚目 まず追加
-	switch (phase_) {
-	case Phase::kPlay:
-		// ゲームプレイフェーズの処理
-		break;
-	case Phase::kDeath:
-		// 02_12 34枚目 デス演出フェーズの処理
-		// deathParticles_->IsFinished関数をDeathParticles.hに実装
-		deathParticles_->Update();
-		break;
-	case Phase::kFadeIn:
+		ChangePhase();
+
 		// フェード
 		fade_->Update();
-		break;
-	case Phase::kFadeOut:
-		// フェードアウト中
-		fade_->Update();
-		break;
-	}
 
-	player_->Update();
-	skydome_->Update();
-	CController_->Update();
+		// 02_12 5枚目 まず追加
+		switch (phase_) {
+		case Phase::kPlay:
+			// ゲームプレイフェーズの処理
+			break;
+		case Phase::kDeath:
+			// 02_12 34枚目 デス演出フェーズの処理
+			// deathParticles_->IsFinished関数をDeathParticles.hに実装
+			deathParticles_->Update();
+			break;
+		case Phase::kFadeIn:
+			// フェード
+			fade_->Update();
+			break;
+		case Phase::kFadeOut:
+			// フェードアウト中
+			fade_->Update();
+			break;
+		}
 
-	// 02_09 12枚目 敵更新 → 02_10 7枚目で更新
-	//	enemy_->Update();
-	for (Enemy* enemy : enemies_) {
-		enemy->Update();
-	}
+		player_->Update();
+		skydome_->Update();
+		CController_->Update();
 
-	// プレイヤー死亡判定
-	if (player_->IsDead()) {
-		finished_ = true;
-	}
+		// 02_09 12枚目 敵更新 → 02_10 7枚目で更新
+		//	enemy_->Update();
+		for (Enemy* enemy : enemies_) {
+			enemy->Update();
+		}
 
-	// プレイヤークリア判定
-	if (player_->IsClear()) {
-		isClear_ = true;
-	}
+		// プレイヤー死亡判定
+		if (player_->IsDead()) {
+			finished_ = true;
+		}
+
+		// プレイヤークリア判定
+		if (player_->IsClear()) {
+			isClear_ = true;
+		}
 
 #ifdef _DEBUG
-	//if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-	//	// フラグをトグル
-	//	isDebugCameraActive_ = !isDebugCameraActive_;
-	//}
+		// if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		//	// フラグをトグル
+		//	isDebugCameraActive_ = !isDebugCameraActive_;
+		// }
 #endif
 
-	// カメラの処理
-	if (isDebugCameraActive_) {
-		debugCamera_->Update();
-		camera_.matView = debugCamera_->GetCamera().matView;
-		camera_.matProjection = debugCamera_->GetCamera().matProjection;
-		// ビュープロジェクション行列の転送
-		camera_.TransferMatrix();
-	} else {
-		// ビュープロジェクション行列の更新と転送
-		camera_.UpdateMatrix();
-	}
-
-	// ブロックの更新
-	for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
-		for (WorldTransform*& worldTransformBlock : worldTransformBlockLine) {
-
-			if (!worldTransformBlock)
-				continue;
-
-			// アフィン変換～DirectXに転送
-			WorldTransformUpdate(*worldTransformBlock);
+		// カメラの処理
+		if (isDebugCameraActive_) {
+			debugCamera_->Update();
+			camera_.matView = debugCamera_->GetCamera().matView;
+			camera_.matProjection = debugCamera_->GetCamera().matProjection;
+			// ビュープロジェクション行列の転送
+			camera_.TransferMatrix();
+		} else {
+			// ビュープロジェクション行列の更新と転送
+			camera_.UpdateMatrix();
 		}
-	}
 
-	// デバッグカメラの更新
-	debugCamera_->Update();
+		// ブロックの更新
+		for (std::vector<WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+			for (WorldTransform*& worldTransformBlock : worldTransformBlockLine) {
 
-	// 02_10 22枚目 衝突判定
-	CheckAllCollisions();
+				if (!worldTransformBlock)
+					continue;
 
-	// 02_11 18枚目 デスパーティクルあれば更新
-	if (deathParticles_) {
-		deathParticles_->Update();
+				// アフィン変換～DirectXに転送
+				WorldTransformUpdate(*worldTransformBlock);
+			}
+		}
+
+		// デバッグカメラの更新
+		debugCamera_->Update();
+
+		// 02_10 22枚目 衝突判定
+		CheckAllCollisions();
+
+		// 02_11 18枚目 デスパーティクルあれば更新
+		if (deathParticles_) {
+			deathParticles_->Update();
+		}
+
 	}
 }
 
@@ -281,7 +296,7 @@ void GameScene::Draw() {
 	Model::PreDraw(dxCommon->GetCommandList());
 
 	// 自キャラの描画
-	if (phase_ == Phase::kPlay || phase_==Phase::kFadeIn) {
+	if (phase_ == Phase::kPlay || phase_ == Phase::kFadeIn) {
 		player_->Draw();
 	}
 
@@ -313,6 +328,10 @@ void GameScene::Draw() {
 
 	// スプライト描画前処理
 	Sprite::PreDraw(dxCommon->GetCommandList());
+
+	if (isPause_ == true) {
+		pauseSprite_->Draw();
+	}
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
