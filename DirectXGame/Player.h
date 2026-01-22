@@ -121,4 +121,6 @@ private:
 	static inline const float kAttenuationWall = 0.2f;
 	// 02_12 11枚目 デスフラグ
 	bool isDead_ = false;
+	//右または左キーを押しているとき時間
+	float inputTimer_ = 0.0f;
 };

@@ -231,12 +231,12 @@ void GameScene::Update() {
 		enemy->Update();
 	}
 
-#ifdef _DEBUG
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		// フラグをトグル
-		isDebugCameraActive_ = !isDebugCameraActive_;
-	}
-#endif
+//#ifdef _DEBUG
+//	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+//		// フラグをトグル
+//		isDebugCameraActive_ = !isDebugCameraActive_;
+//	}
+//#endif
 
 	// カメラの処理
 	if (isDebugCameraActive_) {

@@ -395,37 +395,7 @@ void Player ::Update() {
 
 	// 接地判定
 	UpdateOnGround(collisionMapInfo);
-	/*
-	    //02_08 スライド22枚目まで実装したら
-	    //（↑でUpdateOnGround関数実装したら）コメントアウト
 
-	    //移動
-	    bool landing = false;
-
-	    // 下降あり？
-	    if (velocity_.y < 0) {
-	        // Y座標が地面以下になったら着地
-	        if (worldTransform_.translation_.y <= 1.0f) {
-	            landing = true;
-	        }
-	    }
-
-	    // 接地判定
-	    if (onGround_) {
-	        // ジャンプ開始
-	        if (velocity_.y > 0.0f) {
-	            onGround_ = false;
-	        }
-	    }else {
-	        // 着地
-	        if (landing) {
-	            worldTransform_.translation_.y = 1.0f;
-	            velocity_.x *= (1.0f - kAttenuation);
-	            velocity_.y  = 0.0f;
-	            onGround_    = true;
-	        }
-	    }
-	*/
 	// 旋回制御
 	if (turnTimer_ > 0.0f) {
 		// タイマーを進める
@@ -440,6 +410,34 @@ void Player ::Update() {
 
 	// ワールド行列更新（アフィン変換～DirectXに転送）
 	WorldTransformUpdate(worldTransform_);
+
+	// playerのx回転
+	if (Input::GetInstance()->PushKey(DIK_RIGHT)) {
+		worldTransform_.rotation_.x += 4.0f / 60.0f;
+		inputTimer_ += 1.0f / 60.0f;
+		if (inputTimer_ > 1.0f) {
+			if (worldTransform_.scale_.x < 2.0) {
+				worldTransform_.scale_ += {0.2f, 0.2f, 0.2f};
+			}
+			inputTimer_ = 0.0f;
+		}
+	}
+	// playerのy回転
+	if (Input::GetInstance()->PushKey(DIK_LEFT)) {
+		worldTransform_.rotation_.x += 4.0f / 60.0f;
+		inputTimer_ += 1.0f / 60.0f;
+		if (inputTimer_ > 1.0f) {
+			if (worldTransform_.scale_.x < 2.0) {
+				worldTransform_.scale_ += {0.2f, 0.2f, 0.2f};
+			}
+			inputTimer_ = 0.0f;
+		}
+	}
+	// spaceを押したらリセット
+	if (Input::GetInstance()->PushKey(DIK_SPACE)) {
+		worldTransform_.rotation_.x = 0.0f;
+		worldTransform_.scale_ = {1.0f, 1.0f, 1.0f};
+	}
 }
 
 void Player::Draw() {
