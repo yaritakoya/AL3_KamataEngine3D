@@ -1,26 +1,28 @@
-#include "GameScene.h"
 #include "KamataEngine.h"
-#include "TitleScene.h" // 02_12 21枚目
+#include "TitleScene.h"
+#include "GameScene.h"
+#include "ClearScene.h"
 #include <Windows.h>
 
 using namespace KamataEngine; // これ書いておくとkamataEngine::書かなくてよい
 
-// 02_12 24枚目
+// シーン管理用変数
 TitleScene* titleScene = nullptr;
 GameScene* gameScene = nullptr;
+ClearScene* clearScene = nullptr;
 
 // 02_12 25枚目(Scene sceneまで)
 enum class Scene {
 	kUnknown = 0,
 	kTitle,
 	kGame,
+	kClear,
 };
 // 現在シーン（型）
 Scene scene = Scene::kUnknown;
 
 // 02_12 29枚目
 void ChangeScene() {
-
 	switch (scene) {
 	case Scene::kTitle:
 		if (titleScene->IsFinished()) {
@@ -36,13 +38,22 @@ void ChangeScene() {
 		// 02_12 30枚目
 		if (gameScene->IsFinished()) {
 			// シーン変更
-			scene = Scene::kTitle;
+			scene = Scene::kClear;
 			delete gameScene;
 			gameScene = nullptr;
+			clearScene = new ClearScene;
+			clearScene->Initialize();
+		}
+		break;
+	case Scene::kClear:
+		if (clearScene->IsFinished()) {
+			// シーン変更
+			scene = Scene::kTitle;
+			delete clearScene;
+			clearScene = nullptr;
 			titleScene = new TitleScene;
 			titleScene->Initialize();
 		}
-		break;
 	}
 }
 
@@ -56,6 +67,9 @@ void UpdateScene() {
 	case Scene::kGame:
 		gameScene->Update();
 		break;
+	case Scene::kClear:
+		clearScene->Update();
+		break;
 	}
 }
 
@@ -67,6 +81,9 @@ void DrawScene() {
 		break;
 	case Scene::kGame:
 		gameScene->Draw();
+		break;
+	case Scene::kClear:
+		clearScene->Draw();
 		break;
 	}
 }

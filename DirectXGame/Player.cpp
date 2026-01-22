@@ -438,6 +438,11 @@ void Player ::Update() {
 		worldTransform_.rotation_.x = 0.0f;
 		worldTransform_.scale_ = {1.0f, 1.0f, 1.0f};
 	}
+
+	//playerのゴール
+	if (worldTransform_.translation_.x > 29.0f) {
+		worldTransform_.translation_.x = 29.0f;
+	}
 }
 
 void Player::Draw() {
