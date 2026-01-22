@@ -440,7 +440,7 @@ void Player ::Update() {
 	}
 
 	//playerのゴール
-	if (worldTransform_.translation_.x > 29.0f) {
+	if (worldTransform_.translation_.x > -20.0f) {
 		isClear_ = true;
 	}
 }

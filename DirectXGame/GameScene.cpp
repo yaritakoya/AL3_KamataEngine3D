@@ -32,7 +32,7 @@ GameScene::~GameScene() {
 	delete deathParticles_;
 	delete deathParticle_model_;
 
-	//フェード
+	// フェード
 	delete fade_;
 }
 
@@ -231,14 +231,16 @@ void GameScene::Update() {
 		enemy->Update();
 	}
 
+	if (player_->IsClear()) {
+		isClear_ = true;
+	}
 
-
-//#ifdef _DEBUG
-//	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-//		// フラグをトグル
-//		isDebugCameraActive_ = !isDebugCameraActive_;
-//	}
-//#endif
+	// #ifdef _DEBUG
+	//	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	//		// フラグをトグル
+	//		isDebugCameraActive_ = !isDebugCameraActive_;
+	//	}
+	// #endif
 
 	// カメラの処理
 	if (isDebugCameraActive_) {
@@ -274,7 +276,6 @@ void GameScene::Update() {
 	if (deathParticles_) {
 		deathParticles_->Update();
 	}
-
 }
 
 void GameScene::Draw() {
@@ -286,7 +287,7 @@ void GameScene::Draw() {
 	Model::PreDraw(dxCommon->GetCommandList());
 
 	// 自キャラの描画
-	if (phase_ == Phase::kPlay || phase_==Phase::kFadeIn) {
+	if (phase_ == Phase::kPlay || phase_ == Phase::kFadeIn) {
 		player_->Draw();
 	}
 
