@@ -272,6 +272,7 @@ void GameScene::Update() {
 	if (deathParticles_) {
 		deathParticles_->Update();
 	}
+
 }
 
 void GameScene::Draw() {

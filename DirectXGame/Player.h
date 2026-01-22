@@ -123,4 +123,6 @@ private:
 	bool isDead_ = false;
 	//右または左キーを押しているとき時間
 	float inputTimer_ = 0.0f;
+	// クリアフラグ
+	bool isClear_ = false;
 };
