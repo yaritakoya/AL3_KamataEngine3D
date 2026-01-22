@@ -36,7 +36,7 @@ void ChangeScene() {
 		break;
 	case Scene::kGame:
 		// 02_12 30枚目
-		if (gameScene->IsFinished()) {
+		if (gameScene->IsClear()) {
 			// シーン変更
 			scene = Scene::kClear;
 			delete gameScene;
