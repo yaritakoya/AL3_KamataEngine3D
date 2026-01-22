@@ -49,6 +49,8 @@ public:
 	// 02_12 11枚目 デスフラグ
 	bool IsDead() const { return isDead_; }
 
+	bool IsClear() const { return isClear_; }
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;

@@ -231,6 +231,8 @@ void GameScene::Update() {
 		enemy->Update();
 	}
 
+
+
 //#ifdef _DEBUG
 //	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
 //		// フラグをトグル
