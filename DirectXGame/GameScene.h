@@ -34,6 +34,13 @@ public:
 
 	bool IsClear() const { return isClear_; }
 
+	bool IsReturnToTitle() const { return returnToTitle_; }
+
+	bool IsReset() const { return reset_; }
+	
+	bool IsEndGame() const { return endGame_; }
+
+
 private:
 	// 02_12 4枚目 ゲームのフェーズ（型）
 	enum class Phase {
@@ -105,6 +112,19 @@ private:
 	// 02_12 26枚目
 	bool finished_ = false;
 	bool isClear_ = false;
+
+	//タイトルへ戻るフラグ
+	bool returnToTitle_ = false;
+	//リセットするフラグ
+	bool reset_ = false;
+	//ゲームを終わらせるフラグ
+	bool endGame_ = false;
+
+	bool poseGraph1_ = false;
+	bool poseGraph2_ = false;
+	bool poseGraph3_ = false;
+
+	bool posetrigger_ = false;
 
 	// フェード
 	Fade* fade_ = nullptr;

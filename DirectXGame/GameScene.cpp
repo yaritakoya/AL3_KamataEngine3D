@@ -32,6 +32,8 @@ GameScene::~GameScene() {
 	delete deathParticles_;
 	delete deathParticle_model_;
 
+
+
 	// フェード
 	delete fade_;
 }
@@ -126,6 +128,9 @@ void GameScene::Initialize() {
 	fade_ = new Fade();
 	fade_->Initialize();
 	fade_->Start(Fade::Status::FadeIn, 1.0f);
+
+	//isClear_ = false;
+	finished_ = false;
 }
 
 // 02_12 10枚目 GameScene::Update関数で呼び出しておく
@@ -233,6 +238,16 @@ void GameScene::Update() {
 
 	if (player_->IsClear()) {
 		isClear_ = true;
+	}
+
+	if (IsReturnToTitle()) {
+		returnToTitle_ = true;
+	}
+	if (IsReset()) {
+		reset_ = true;
+	}
+	if (IsEndGame()) {
+		endGame_ = true;
 	}
 
 	// #ifdef _DEBUG
