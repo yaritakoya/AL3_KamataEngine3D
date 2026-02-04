@@ -41,7 +41,7 @@ void MapChipField::LoadMapChipCsv(const std::string& filePath) {
 	//ファイルを開く
 	std::ifstream file;
 	file.open(filePath);
-	assert(file.is_open());
+	//assert(file.is_open());
 
 	//マップチップCSV
 	std::stringstream mapChipCsv;

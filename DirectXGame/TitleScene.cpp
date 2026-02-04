@@ -10,7 +10,7 @@ TitleScene::~TitleScene() {
 
 void TitleScene::Initialize() {
 
-	modelTitle_ = Model::CreateFromOBJ("titleFont", true);
+	modelTitle_ = Model::CreateFromOBJ("title", true);
 	modelPlayer_ = Model::CreateFromOBJ("player");
 
 	// カメラ初期化
