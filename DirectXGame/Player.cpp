@@ -31,6 +31,16 @@ void Player::InputMove() {
 			// 左右加速
 			Vector3 acceleration = {};
 			if (Input::GetInstance()->PushKey(DIK_RIGHT)) {
+				walkTimer_++;
+				if (walkTimer_ < 10) {
+					worldTransform_.rotation_.y += 0.03f;
+				}
+				if (walkTimer_ >= 10 && walkTimer_ < 20) {
+					worldTransform_.rotation_.y -= 0.03f;
+				}
+				if (walkTimer_ >= 20) {
+					walkTimer_ = 0;
+				}
 				if (velocity_.x < 0.0f) {
 					// 旋回の最初は移動減衰をかける
 					velocity_.x *= (1.0f - kAttenuation);
@@ -42,6 +52,16 @@ void Player::InputMove() {
 					turnTimer_ = kTimeTurn;
 				}
 			} else if (Input::GetInstance()->PushKey(DIK_LEFT)) {
+				walkTimer_++;
+				if (walkTimer_ < 10) {
+					worldTransform_.rotation_.y += 0.03f;
+				}
+				if (walkTimer_ >= 10 && walkTimer_ < 20) {
+					worldTransform_.rotation_.y -= 0.03f;
+				}
+				if (walkTimer_ >= 20) {
+					walkTimer_ = 0;
+				}
 				if (velocity_.x > 0.0f) {
 					// 旋回の最初は移動減衰をかける
 					velocity_.x *= (1.0f - kAttenuation);

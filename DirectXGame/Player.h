@@ -126,4 +126,7 @@ private:
 	bool isDead_ = false;
 	// プレイヤーがクリアしたかどうか
 	bool isClear_ = false;
+
+	int walkTimer_ = 0;
+	bool walkflag_ = false;
 };
