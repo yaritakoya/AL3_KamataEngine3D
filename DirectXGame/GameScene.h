@@ -7,7 +7,10 @@ using namespace KamataEngine;
 // ゲームシーン
 class GameScene {
 public:
+	enum class BlockAnimation { Wave, OddEven, Random, Center };
+
 	~GameScene();
+	
 	// 初期化
 	void Initialize();
 
@@ -31,5 +34,12 @@ private:
 	bool isDebugCameraActive_ = false;
 	//デバックカメラの生成
 	DebugCamera* debugCamera_ = nullptr;
-
+	// アニメーションの種類
+	BlockAnimation blockAnimation_ = BlockAnimation::Wave;
+	// アニメーションタイマー
+	float animationTimer_ = 0.0f;
+	// ランダムアニメーション用のタイマー
+	float randomTimer_ = 0.0f;
+	// ランダムアニメーション用のインデックス
+	int randomIndex_ = 0;
 };
